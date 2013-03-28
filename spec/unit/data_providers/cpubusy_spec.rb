@@ -1,27 +1,27 @@
 require 'spec_helper'
 
-describe Bitstat::Cpubusy do
+describe Bitstat::DataProviders::Cpubusy do
   describe '#new' do
     it 'takes Vestat object as parameter' do
-      expect { Bitstat::Cpubusy.new }.to raise_error(ArgumentError)
-      expect { Bitstat::Cpubusy.new(Object.new) }.to raise_error(ArgumentError)
-      expect { Bitstat::Cpubusy.new(Bitstat::Vestat.new({ :path => nil })) }.not_to raise_error
+      expect { Bitstat::DataProviders::Cpubusy.new }.to raise_error(ArgumentError)
+      expect { Bitstat::DataProviders::Cpubusy.new(Object.new) }.to raise_error(ArgumentError)
+      expect { Bitstat::DataProviders::Cpubusy.new(Bitstat::DataProviders::Vestat.new({ :path => nil })) }.not_to raise_error
     end
   end
 
   describe '#regenerate!' do
     it 'calls #regenerate! on Vestat object' do
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.should_receive(:regenerate!).once
       vestat.should_receive(:vpss).once
-      cpubusy = Bitstat::Cpubusy.new(vestat)
+      cpubusy = Bitstat::DataProviders::Cpubusy.new(vestat)
       cpubusy.regenerate!
     end
   end
 
   describe '#calculate_diff' do
     before (:each) do
-      @cpubusy = Bitstat::Cpubusy.new(Bitstat::Vestat.new({ :path => nil }))
+      @cpubusy = Bitstat::DataProviders::Cpubusy.new(Bitstat::DataProviders::Vestat.new({ :path => nil }))
     end
     it 'takes two hashes and returns hash' do
       expected_hash = {}
@@ -66,13 +66,13 @@ describe Bitstat::Cpubusy do
 
   describe '#each_vps' do
     before (:each) do
-      @vestat = Bitstat::Vestat.new({ :path => nil })
+      @vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       @vestat.stub(:regenerate!)
       @vestat.stub(:vpss).and_return(
           { 1 => { :idle => 10 }},
           { 1 => { :idle => 15 }, 2 => { :idle => 30}}
       )
-      @cpubusy = Bitstat::Cpubusy.new(@vestat)
+      @cpubusy = Bitstat::DataProviders::Cpubusy.new(@vestat)
       @cpubusy.stub(:calculate_load)
     end
 
@@ -98,8 +98,8 @@ describe Bitstat::Cpubusy do
 
   describe '#caluculate_load' do
     before (:each) do
-      @vestat = Bitstat::Vestat.new({ :path => nil })
-      @cpubusy = Bitstat::Cpubusy.new(@vestat)
+      @vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
+      @cpubusy = Bitstat::DataProviders::Cpubusy.new(@vestat)
     end
 
     it 'takes hash with keys :idle, :user, :nice and :system and calculates cpubusy time' do
@@ -134,13 +134,13 @@ describe Bitstat::Cpubusy do
 
   describe '#vpss' do
     before (:each) do
-      @vestat = Bitstat::Vestat.new({ :path => nil })
+      @vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       @vestat.stub(:regenerate!)
       @vestat.stub(:vpss).and_return(
           { 1 => {} },
           { 1 => {}, 2 => {} }
       )
-      @cpubusy = Bitstat::Cpubusy.new(@vestat)
+      @cpubusy = Bitstat::DataProviders::Cpubusy.new(@vestat)
       @cpubusy.stub(:calculate_load)
     end
 

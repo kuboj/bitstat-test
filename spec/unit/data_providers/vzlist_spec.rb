@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Bitstat::Vzlist do
+describe Bitstat::DataProviders::Vzlist do
   describe '#new' do
     it 'takes array of fields as parameter' do
-      expect { Bitstat::Vzlist.new }.to raise_error(ArgumentError)
-      expect { Bitstat::Vzlist.new({}) }.to raise_error(IndexError)
-      expect { Bitstat::Vzlist.new({ :fields => nil }) }.not_to raise_error(IndexError)
+      expect { Bitstat::DataProviders::Vzlist.new }.to raise_error(ArgumentError)
+      expect { Bitstat::DataProviders::Vzlist.new({}) }.to raise_error(IndexError)
+      expect { Bitstat::DataProviders::Vzlist.new({ :fields => nil }) }.not_to raise_error(IndexError)
     end
   end
 
@@ -20,7 +20,7 @@ describe Bitstat::Vzlist do
        721      52436
       VZLIST
 
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(physpages) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.stub(:get_vzlist_output => vzlist_text)
       vzlist.should_receive(:parse_line).exactly(vzlist_text.lines.to_a.size).times
       vzlist.regenerate!
@@ -29,19 +29,19 @@ describe Bitstat::Vzlist do
 
   describe '#command' do
     it 'returns correct vzlist command' do
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(physpages) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.command.should eql 'vzlist -Hto veid,physpages'
     end
 
     it 'always include "veid" field' do
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(cpulimit) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(cpulimit) })
       vzlist.command.should eql 'vzlist -Hto veid,cpulimit'
     end
   end
 
   describe '#parse_line' do
     it 'parses vzlist output and returns hash with symbolized keys passed in constructor' do
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(physpages hostname) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages hostname) })
       expected = {
           :veid      => '721',
           :physpages => '52435',
@@ -51,7 +51,7 @@ describe Bitstat::Vzlist do
     end
 
     it 'it returns nil for fields which cannot be parsed' do
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(physpages hostname) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages hostname) })
       expected = {
           :veid      => '721',
           :physpages => '52435',
@@ -69,7 +69,7 @@ describe Bitstat::Vzlist do
        715      63114
       VZLIST
 
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(physpages) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.stub(:get_vzlist_output => vzlist_text)
       vzlist.regenerate!
       expect { |b| vzlist.each_vps(&b) }.to yield_successive_args(
@@ -88,7 +88,7 @@ describe Bitstat::Vzlist do
        715      63114
       VZLIST
 
-      vzlist = Bitstat::Vzlist.new({ :fields => %w(physpages) })
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.stub(:get_vzlist_output => vzlist_text)
       vzlist.regenerate!
       expected_hash = {

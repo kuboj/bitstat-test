@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Bitstat::Vestat do
+describe Bitstat::DataProviders::Vestat do
   describe '#new' do
     it 'takes hash with as parameter with obligatory key `path`' do
-      expect { Bitstat::Vestat.new }.to raise_error(ArgumentError)
-      expect { Bitstat::Vestat.new({}) }.to raise_error(IndexError)
-      expect { Bitstat::Vestat.new({ :path => '/proc/vz/vestat' }) }.not_to raise_error
+      expect { Bitstat::DataProviders::Vestat.new }.to raise_error(ArgumentError)
+      expect { Bitstat::DataProviders::Vestat.new({}) }.to raise_error(IndexError)
+      expect { Bitstat::DataProviders::Vestat.new({ :path => '/proc/vz/vestat' }) }.not_to raise_error
     end
   end
 
@@ -19,7 +19,7 @@ Version: 2.2
                  717               117552                   15               292414            104577038      101321395698055                    0      104577038844598         481582384839                    0                    0                    0
       VESTAT
 
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.stub(:get_vestat_output => vestat_text)
       vestat.should_receive(:parse_line).exactly(3).times
       vestat.regenerate!
@@ -28,7 +28,7 @@ Version: 2.2
 
   describe '#skip_line?' do
     it 'returns true if line includes headers' do
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.skip_line?(' kvik').should be_false
       vestat.skip_line?('blabla Version bla').should be_true
       vestat.skip_line?('     Version').should be_true
@@ -38,20 +38,20 @@ Version: 2.2
 
   describe '#parse_line' do
     it 'returns array of integers with 1st, 2nd, 3rd, 4th and 6th column' do
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.parse_line('   1    2   3   4   5      6   7  8 9').should eql [1, 2, 3, 4, 6]
       vestat.parse_line('1    2   3  4 5 6').should eql [1, 2, 3, 4, 6]
     end
 
     it 'returns nil when values are not available' do
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.parse_line('  1 2').should eql [1, 2, nil, nil, nil]
     end
   end
 
   describe '#get_vestat_output' do
     it 'calls readlines on file given in constructor' do
-      vestat = Bitstat::Vestat.new({ :path => 'path' })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => 'path' })
       File.should_receive(:readlines).with('path')
       vestat.get_vestat_output
     end
@@ -67,7 +67,7 @@ Version: 2.2
                  717               117552                   15               292414            104577038      101321395698055                    0      104577038844598         481582384839                    0                    0                    0
       VESTAT
 
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.stub(:get_vestat_output => vestat_text)
       vestat.regenerate!
       expect { |b| vestat.each_vps(&b) }.to yield_successive_args(
@@ -88,7 +88,7 @@ Version: 2.2
                  717               117552                   15               292414            104577038      101321395698055                    0      104577038844598         481582384839                    0                    0                    0
       VESTAT
 
-      vestat = Bitstat::Vestat.new({ :path => nil })
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.stub(:get_vestat_output => vestat_text)
       vestat.regenerate!
       expected_hash = {
