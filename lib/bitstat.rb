@@ -13,7 +13,8 @@ require 'bitstat/data_providers/cpubusy'
 require 'bitstat/data_providers/vestat'
 require 'bitstat/data_providers/vzlist'
 
-require 'bitstat/watchers/up_watcher'
+require 'bitstat/watchers/up'
+require 'bitstat/watchers/average'
 
 module Bitstat
 

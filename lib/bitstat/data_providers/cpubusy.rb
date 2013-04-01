@@ -45,6 +45,29 @@ module Bitstat
         100.0 - data[:idle] * 100.0 / (100.0**3 * (data[:user] + data[:nice] + data[:system]) + data[:idle])
       end
 
+      # Returns hash of vpss indexed by vps id. Each vps is represented
+      # by hash with only one key - :cpubusy. Note that :cpubusy is calculated
+      # via diff of underlaying values from Vestat, therefore two calls of
+      # #regenerate! are required to get :cpubusy values
+      #
+      # @example
+      # cpubusy = Cpubusy.new(Vestat.new({ :path => '/proc/vz/vestat' }))
+      # cpubusy.vpss
+      # -> {}
+      # cpubusy.regenerate!
+      # -> {}
+      # cpubusy.regenerate!
+      # cpubusy.vpss
+      # -> {
+      #        13 => {
+      #           :cpubusy => 19
+      #        },
+      #        18 => {
+      #           :cpubusy => 0
+      #        }
+      #    }
+      #
+      # @returns [Hash]
       def vpss
         out = {}
         @diff.each { |vps_id, diff| out[vps_id] = { :cpubusy => calculate_load(diff) } }

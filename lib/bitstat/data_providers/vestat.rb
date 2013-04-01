@@ -5,6 +5,7 @@ module Bitstat
 
       def initialize(options)
         @path = options.fetch(:path)
+        @vpss = []
       end
 
       def regenerate!
@@ -39,6 +40,31 @@ module Bitstat
         @vpss.each { |vps| block.call(vps) }
       end
 
+      # Returns hash of vpss indexed by vps id. Each vps is represented
+      # by hash with keys :user, :nice, :system and :idle
+      #
+      # @example
+      # vestat = Vestat.new({ :path => '/proc/vz/vestat' })
+      # vestat.vps
+      # -> {}
+      # vestat.regenerate!
+      # vestat.vpss
+      # -> {
+      #        13 => {
+      #           :user   => 224,
+      #           :nice   => 42,
+      #           :system => 34,
+      #           :idle   => 24242424125,
+      #        },
+      #        18 => {
+      #           :user   => 224,
+      #           :nice   => 42,
+      #           :system => 34,
+      #           :idle   => 24242424125,
+      #        }
+      #    }
+      #
+      # @returns [Hash]
       def vpss
         # returns hash of vpss indexed by veid and deletes veid from vps data
         @vpss.inject({}) { |out, vps| out[vps[:veid].to_i] = vps.reject { |k, _| k == :veid } ; out }
