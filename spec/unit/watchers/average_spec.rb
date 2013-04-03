@@ -1,8 +1,17 @@
 require 'spec_helper'
 
 describe Bitstat::Watchers::Average do
+  before (:each) do
+    @interval = 3
+    @count    = 2
+    @average  = Bitstat::Watchers::Average.new({
+                                                   :interval => @interval,
+                                                   :count    => @count
+                                               })
+  end
+
   describe '#new' do
-    it 'takes hash with keys :threshold, :exceed_count, :interval and :aging' do
+    it 'takes hash with keys :interval and :count' do
       expect { Bitstat::Watchers::Average.new({}) }.to raise_error(IndexError)
       expect { Bitstat::Watchers::Average.new({
                                                   :interval => nil,
@@ -12,21 +21,40 @@ describe Bitstat::Watchers::Average do
   end
 
   describe '#notify?' do
-    it 'returns true if #update was called more or equal than :count times'
+    it 'returns true if #update was called more or equal than :count*:interval times' do
+      @average.update(10)
+      @average.notify?.should be_false
+      @average.update(20) # ignored
+      @average.notify?.should be_false
+      @average.update(30) # ignored
+      @average.notify?.should be_false
+      @average.update(50)
+      @average.notify?.should be_true
+    end
   end
 
   describe '#reset' do
-    it 'resets sum and average'
-  end
-
-  describe '#update' do
-    it 'increases value_counter and sum'
-    it 'returns false and does nothing if called less than :interval times'
-    it 'returns true if called :interval times'
-    it 'returns true if called more than :interval times'
+    it 'resets sum and average' do
+      @average.update(10)
+      @average.update(20) # ignored
+      @average.update(30) # ignored
+      @average.update(50)
+      @average.reset
+      @average.value.should eql 0.0
+    end
   end
 
   describe '#value' do
-    it 'returns average value passed to #update'
+    it 'returns average value passed to #update' do
+      @average.update(10)
+      @average.update(20) # ignored
+      @average.update(30) # ignored
+      @average.update(50)
+      @average.value.should eql 30.0
+    end
+
+    it 'returns 0 if no values were provided' do
+      @average.value.should eql 0.0
+    end
   end
 end
