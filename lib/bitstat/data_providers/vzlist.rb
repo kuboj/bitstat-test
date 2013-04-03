@@ -9,7 +9,7 @@ module Bitstat
         @vpss   = []
       end
 
-      def regenerate!
+      def regenerate
         @vpss = []
         get_vzlist_output.each_line { |l| @vpss << parse_line(l) }
       end
@@ -37,7 +37,7 @@ module Bitstat
       # vzlist = Vzlist.new({ :fields => ['physpages', 'diskinodes'] })
       # vzlist.vpss
       # -> {}
-      # vzlist.regenerate!
+      # vzlist.regenerate
       # vzlist.vpss
       # -> {
       #        13 => {

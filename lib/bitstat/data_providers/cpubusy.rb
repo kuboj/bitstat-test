@@ -10,8 +10,8 @@ module Bitstat
         @diff   = {}
       end
 
-      def regenerate!
-        @vestat.regenerate!
+      def regenerate
+        @vestat.regenerate
         new_data = @vestat.vpss
         @diff = calculate_diff(new_data, @vpss) unless @vpss.empty?
         @vpss = new_data
@@ -48,22 +48,22 @@ module Bitstat
       # Returns hash of vpss indexed by vps id. Each vps is represented
       # by hash with only one key - :cpubusy. Note that :cpubusy is calculated
       # via diff of underlaying values from Vestat, therefore two calls of
-      # #regenerate! are required to get :cpubusy values
+      # #regenerate are required to get :cpubusy values
       #
       # @example
       # cpubusy = Cpubusy.new(Vestat.new({ :path => '/proc/vz/vestat' }))
       # cpubusy.vpss
       # -> {}
-      # cpubusy.regenerate!
+      # cpubusy.regenerate
       # -> {}
-      # cpubusy.regenerate!
+      # cpubusy.regenerate
       # cpubusy.vpss
       # -> {
       #        13 => {
       #           :cpubusy => 19
       #        },
       #        18 => {
-      #           :cpubusy => 0
+      #           :cpubusy => 
       #        }
       #    }
       #

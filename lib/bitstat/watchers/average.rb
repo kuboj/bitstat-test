@@ -1,6 +1,7 @@
 module Bitstat
   module Watchers
     class Average
+      include Bitlogger::Loggable
       extend CallFilter
 
       # each :interval call of #update will be taken, otherwise value dropped

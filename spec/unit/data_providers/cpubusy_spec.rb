@@ -9,13 +9,13 @@ describe Bitstat::DataProviders::Cpubusy do
     end
   end
 
-  describe '#regenerate!' do
-    it 'calls #regenerate! on Vestat object' do
+  describe '#regenerate' do
+    it 'calls #regenerate on Vestat object' do
       vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
-      vestat.should_receive(:regenerate!).once
+      vestat.should_receive(:regenerate).once
       vestat.should_receive(:vpss).once
       cpubusy = Bitstat::DataProviders::Cpubusy.new(vestat)
-      cpubusy.regenerate!
+      cpubusy.regenerate
     end
   end
 
@@ -67,7 +67,7 @@ describe Bitstat::DataProviders::Cpubusy do
   describe '#each_vps' do
     before (:each) do
       @vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
-      @vestat.stub(:regenerate!)
+      @vestat.stub(:regenerate)
       @vestat.stub(:vpss).and_return(
           { 1 => { :idle => 10 }},
           { 1 => { :idle => 15 }, 2 => { :idle => 30}}
@@ -76,19 +76,19 @@ describe Bitstat::DataProviders::Cpubusy do
       @cpubusy.stub(:calculate_load)
     end
 
-    it 'yields zero times if #regenerate! was not called' do
+    it 'yields zero times if #regenerate was not called' do
       expect { |b| @cpubusy.each_vps(&b) }.not_to yield_control
     end
 
-    it 'yields zero times if #regenerate! was called only once' do
-      @cpubusy.regenerate!
+    it 'yields zero times if #regenerate was called only once' do
+      @cpubusy.regenerate
       expect { |b| @cpubusy.each_vps(&b) }.not_to yield_control
     end
 
     it 'passes to block hash with keys :cpubusy and :veid' do
       @cpubusy.stub(:calculate_load).and_return(1)
-      @cpubusy.regenerate!
-      @cpubusy.regenerate!
+      @cpubusy.regenerate
+      @cpubusy.regenerate
       expect { |b| @cpubusy.each_vps(&b) }.to yield_successive_args(
           { :veid => 1, :cpubusy => 1 },
           { :veid => 2, :cpubusy => 1 }
@@ -135,7 +135,7 @@ describe Bitstat::DataProviders::Cpubusy do
   describe '#vpss' do
     before (:each) do
       @vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
-      @vestat.stub(:regenerate!)
+      @vestat.stub(:regenerate)
       @vestat.stub(:vpss).and_return(
           { 1 => {} },
           { 1 => {}, 2 => {} }
@@ -147,8 +147,8 @@ describe Bitstat::DataProviders::Cpubusy do
     it 'returns hash of vpss' do
       fake_cpubusy = 10.0
       @cpubusy.stub(:calculate_load).and_return(fake_cpubusy)
-      @cpubusy.regenerate!
-      @cpubusy.regenerate!
+      @cpubusy.regenerate
+      @cpubusy.regenerate
       expected = {
           1 => { :cpubusy => fake_cpubusy },
           2 => { :cpubusy => fake_cpubusy }

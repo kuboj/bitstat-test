@@ -9,7 +9,7 @@ describe Bitstat::DataProviders::Vzlist do
     end
   end
 
-  describe '#regenerate!' do
+  describe '#regenerate' do
     it 'calls vzlist command and parses each line of output' do
       vzlist_text = <<-VZLIST
        711      42851
@@ -23,7 +23,7 @@ describe Bitstat::DataProviders::Vzlist do
       vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.stub(:get_vzlist_output => vzlist_text)
       vzlist.should_receive(:parse_line).exactly(vzlist_text.lines.to_a.size).times
-      vzlist.regenerate!
+      vzlist.regenerate
     end
   end
 
@@ -71,7 +71,7 @@ describe Bitstat::DataProviders::Vzlist do
 
       vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.stub(:get_vzlist_output => vzlist_text)
-      vzlist.regenerate!
+      vzlist.regenerate
       expect { |b| vzlist.each_vps(&b) }.to yield_successive_args(
           { :veid => '711', :physpages => '42851'},
           { :veid => '713', :physpages => '38662'},
@@ -90,7 +90,7 @@ describe Bitstat::DataProviders::Vzlist do
 
       vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages) })
       vzlist.stub(:get_vzlist_output => vzlist_text)
-      vzlist.regenerate!
+      vzlist.regenerate
       expected_hash = {
           711 => { :physpages => '42851' },
           713 => { :physpages => '38662' },

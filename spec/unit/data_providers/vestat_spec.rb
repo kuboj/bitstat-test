@@ -9,7 +9,7 @@ describe Bitstat::DataProviders::Vestat do
     end
   end
 
-  describe '#regenerate!' do
+  describe '#regenerate' do
     it 'reads file and parses each line' do
       vestat_text = <<-VESTAT
 Version: 2.2
@@ -22,7 +22,7 @@ Version: 2.2
       vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.stub(:get_vestat_output => vestat_text)
       vestat.should_receive(:parse_line).exactly(3).times
-      vestat.regenerate!
+      vestat.regenerate
     end
   end
 
@@ -69,7 +69,7 @@ Version: 2.2
 
       vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.stub(:get_vestat_output => vestat_text)
-      vestat.regenerate!
+      vestat.regenerate
       expect { |b| vestat.each_vps(&b) }.to yield_successive_args(
           { :veid => 721, :user => 66017, :nice => 17, :system => 139850, :idle => 101385808831824 },
           { :veid => 719, :user => 779973, :nice => 13, :system => 457112, :idle => 106365771148640 },
@@ -90,7 +90,7 @@ Version: 2.2
 
       vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
       vestat.stub(:get_vestat_output => vestat_text)
-      vestat.regenerate!
+      vestat.regenerate
       expected_hash = {
           721 => { :user => 66017, :nice => 17, :system => 139850, :idle => 101385808831824 },
           719 => { :user => 779973, :nice => 13, :system => 457112, :idle => 106365771148640 },

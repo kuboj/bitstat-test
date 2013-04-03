@@ -8,7 +8,7 @@ module Bitstat
         @vpss = []
       end
 
-      def regenerate!
+      def regenerate
         @vpss = []
         get_vestat_output.each_line do |l|
           next if skip_line?(l)
@@ -47,7 +47,7 @@ module Bitstat
       # vestat = Vestat.new({ :path => '/proc/vz/vestat' })
       # vestat.vps
       # -> {}
-      # vestat.regenerate!
+      # vestat.regenerate
       # vestat.vpss
       # -> {
       #        13 => {
