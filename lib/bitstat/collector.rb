@@ -1,19 +1,22 @@
 module Bitstat
   class Collector
     include Bitlogger::Loggable
-    include Observable
 
     def initialize
       @data_providers = {}
+      @observers      = {}
     end
 
     def set_data_provider(label, provider)
       @data_providers[label] = provider
     end
 
+    def delete_data_provider(label)
+      @data_providers.delete(label)
+    end
+
     def regenerate
       @data_providers.values.map(&:regenerate)
-      changed
     end
 
     def get_data
@@ -31,6 +34,16 @@ module Bitstat
       notify_observers(get_data)
     end
 
-    # TODO: reimplement observable pattern -> observers (Hash) indexed by node_id
+    def set_observer(id, observer)
+      @observers[id] = observer
+    end
+
+    def delete_observer(id)
+      @observers.delete(id)
+    end
+
+    def notify_observers(data)
+      @observers.values.each { |observer| observer.update(data) }
+    end
   end
 end

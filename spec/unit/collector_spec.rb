@@ -6,8 +6,36 @@ describe Bitstat::Collector do
   end
 
   describe '#set_data_provider' do
-    it 'adds data provider at given key if already does not exist'
-    it 'replaces existing data provider at given key if present'
+    it 'adds data provider at given key if already does not exist' do
+      provider = double()
+      provider.should_receive(:regenerate).once
+      @collector.set_data_provider(:test, provider)
+      @collector.regenerate
+    end
+
+    it 'replaces existing data provider at given key if present' do
+      provider1 = double()
+      provider1.should_not_receive(:regenerate)
+      provider2 = double()
+      provider2.should_receive(:regenerate)
+      @collector.set_data_provider(:test, provider1)
+      @collector.set_data_provider(:test, provider2)
+      @collector.regenerate
+    end
+  end
+
+  describe '#delete_data_provider' do
+    it 'deletes data provider with given key therefore it would get no more #regenerate calls' do
+      provider = double()
+      provider.should_not_receive(:regenerate)
+      @collector.set_data_provider(:test, provider)
+      @collector.delete_data_provider(:test)
+      @collector.regenerate
+    end
+
+    it 'returns nil if data provider with given key does not exist' do
+      @collector.delete_data_provider(:test).should be_nil
+    end
   end
 
   describe '#regenerate' do
@@ -56,8 +84,8 @@ describe Bitstat::Collector do
       observer2 = double()
       observer1.should_receive(:update).with(mocked_data)
       observer2.should_receive(:update).with(mocked_data)
-      @collector.add_observer(observer1)
-      @collector.add_observer(observer2)
+      @collector.set_observer(10, observer1)
+      @collector.set_observer(20, observer2)
       @collector.regenerate
       @collector.notify_all
     end
@@ -69,11 +97,57 @@ describe Bitstat::Collector do
       observer2 = double()
       observer1.should_not_receive(:update)
       observer2.should_receive(:update).with(mocked_data)
-      @collector.add_observer(observer1)
-      @collector.delete_observer(observer1)
-      @collector.add_observer(observer2)
+      @collector.set_observer(10, observer1)
+      @collector.delete_observer(10)
+      @collector.set_observer(20, observer2)
       @collector.regenerate
       @collector.notify_all
+    end
+  end
+
+  describe '#set_observer' do
+    it 'adds new observer' do
+      observer = double()
+      observer.should_receive(:update).once
+      @collector.set_observer(2, observer)
+      @collector.notify_observers({})
+    end
+
+    it 'replaces observer if observer with same id already exists' do
+      observer1 = double()
+      observer1.should_not_receive(:update)
+      observer2 = double()
+      observer2.should_receive(:update).once
+      @collector.set_observer(1, observer1)
+      @collector.set_observer(1, observer2)
+      @collector.notify_observers({})
+    end
+  end
+
+  describe '#delete_observer' do
+    it 'deletes observer therefore it would get #update no more' do
+      observer = double()
+      observer.should_not_receive(:update)
+      @collector.set_observer(1, observer)
+      @collector.delete_observer(1)
+      @collector.notify_observers({})
+    end
+
+    it 'returns nil if observer with given id does not exist' do
+      @collector.delete_observer(:test).should be_nil
+    end
+  end
+
+  describe '#notify_observers' do
+    it 'calls #update on each observer with given data' do
+      mocked_data = { 1 => { :cpubusy => 10 }, 2 => { :physpages => 234 } }
+      observer1 = double()
+      observer1.should_receive(:update).once.with(mocked_data)
+      observer2 = double()
+      observer2.should_receive(:update).once.with(mocked_data)
+      @collector.set_observer(1, observer1)
+      @collector.set_observer(2, observer2)
+      @collector.notify_observers(mocked_data)
     end
   end
 end
