@@ -34,7 +34,7 @@ module Bitstat
       end
 
       def age
-        @count -= @aging
+        @count = [0, @count - @aging].max
       end
     end
   end
