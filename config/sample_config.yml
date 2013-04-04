@@ -1,0 +1,27 @@
+bitstat:
+  # defines how often will be data_providers requested for new data (in seconds)
+  tick: 1
+  # path to vestat file for counting cpubusy
+  vestat_path: /proc/vz/vestat
+  # vzctl_version: 4.1
+  # vzlist_fields:
+  #  - physpages
+  #  - diskinodes
+  #  - diskspace
+
+bitsuper:
+  url: https://admin:admin@localhost:30000
+  # verifies server cert when executing rest client call
+  verify_crt: false
+  # absolute path to CA crt
+  ca_crt_path: /etc/ssl/relbit/ca.crt
+
+devel:
+  # sets $DEBUG flag
+  debug: false
+
+logging:
+  # 'supervisor', 'stderr' or path to logfile
+  target: stderr
+  # level from which log - debug, warn, info, error, fatal
+  level: debug
