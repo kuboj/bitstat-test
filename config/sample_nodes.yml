@@ -1,0 +1,39 @@
+# node id
+1:
+  cpubusy: # parameter
+    up: # watcher and its parameters
+      threshold:  80
+      count:      10
+      aging:     0.1
+      interval:    1
+    down:
+      threshold:  20
+      count:      10
+      aging:     0.1
+      interval:    1
+    average:
+      interval:    1
+      count:      10
+  diskinodes:
+    up:
+      threshold: 5000001
+      count:           2
+      aging:           0
+      interval:       10
+    average:
+      interval:        1
+      count:          10
+  physpages:
+    up:
+      threshold: 819
+      count:       2
+      aging:       0
+      interval:    2
+    down:
+      threshold:   0 # TODO: what if threshold is -1 or 0? create watcher object then?
+      count:       4 # TODO:   what about adding whole `down` section by bitsuper and so?
+      aging:       0
+      interval:    2
+    average:
+      interval:    1
+      count:      10

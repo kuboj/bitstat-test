@@ -9,6 +9,7 @@ tmp/
 
 # config
 config/config.yml
+config/nodes.yml
 config/original_config.yml
 
 # JetBrains RubyMine files
