@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'bundler'
 require 'yaml'
-require 'observer'
+require 'rack/test'
 Bundler.require(:default)
 
 APP_DIR = File.expand_path("#{File.dirname(__FILE__)}/../")
@@ -10,6 +10,10 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require 'bitstat/call_filter'
 require 'bitstat/collector'
+require 'bitstat/cli'
+require 'bitstat/controller'
+require 'bitstat/http_server'
+require 'bitstat/sinatra_app'
 require 'bitstat/version'
 
 require 'bitstat/data_providers/cpubusy'

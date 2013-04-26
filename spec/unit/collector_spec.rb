@@ -49,6 +49,7 @@ describe Bitstat::Collector do
       @collector.regenerate
     end
 
+
     it 'would not call #regenerate on replaced data_provider' do
       provider1 = double()
       provider1.should_not_receive(:regenerate)

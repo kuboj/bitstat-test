@@ -7,6 +7,7 @@ RSpec.configure do |config|
     Bitlogger.init({ :target => File.open('/dev/null', 'w') })
   end
 
+  config.include Rack::Test::Methods
   config.color_enabled = true
   config.tty           = true
   config.formatter     = :documentation

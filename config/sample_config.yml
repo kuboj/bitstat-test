@@ -1,4 +1,6 @@
 bitstat:
+  # port to listen for commands from bitstatctl
+  port: 10000
   # defines how often will be data_providers requested for new data (in seconds)
   tick: 1
   # path to vestat file for counting cpubusy
