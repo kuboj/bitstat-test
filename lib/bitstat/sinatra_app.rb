@@ -10,9 +10,6 @@ module Bitstat
       begin
         [200, @@callback.call(params)]
       rescue => e
-        puts "------- #{e.class}: #{e.message} -------"
-        puts "------- #{e.backtrace[0]} -------"
-        puts "------- #{e.backtrace[1]} -------"
         halt(500, "Error: #{e.class}: #{e.message}")
       end
     end

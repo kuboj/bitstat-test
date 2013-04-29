@@ -14,6 +14,12 @@ module Bitstat
 
     end
 
-    # TODO: info, get_vps_data, ...
+    def reload
+
+    end
+
+    def info(data)
+
+    end
   end
 end

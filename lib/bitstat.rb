@@ -13,6 +13,7 @@ require 'bitstat/collector'
 require 'bitstat/cli'
 require 'bitstat/controller'
 require 'bitstat/http_server'
+require 'bitstat/sender'
 require 'bitstat/sinatra_app'
 require 'bitstat/version'
 
@@ -23,6 +24,8 @@ require 'bitstat/data_providers/vzlist'
 require 'bitstat/watchers/average'
 require 'bitstat/watchers/down'
 require 'bitstat/watchers/up'
+
+require 'bitstat/core_ext/object'
 
 module Bitstat
 

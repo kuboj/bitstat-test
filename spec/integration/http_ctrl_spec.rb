@@ -4,7 +4,8 @@ describe Bitstat do
   describe '' do
     before do
       @port = 10000
-      @controller = Bitstat::Controller.new({ :port => @port })
+      @controller = Bitstat::Controller.new(:port => @port)
+      @sender = Bitstat::Sender.new(:port => @port, :host => 'localhost')
       @application_stub = double()
       @application_stub.stub(:start)
       @controller.stub(:application).and_return(@application_stub)
@@ -13,11 +14,10 @@ describe Bitstat do
 
     it 'works!' do
       action = 'testing_action'
-      data   = { 'a' => 'b' }
-      retval = 'blah'
+      data   = { :a => 'b' }
+      retval = { :b => 123 }
       @controller.should_receive(action.to_sym).with(data).and_return { retval }
-      r = RestClient.post("http://localhost:#@port/", (data).merge(:action => action))
-      r.should eql retval
+      @sender.send((data).merge(:action => action)).should eql retval
     end
   end
 end

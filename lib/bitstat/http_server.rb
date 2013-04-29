@@ -25,8 +25,8 @@ module Bitstat
 
     def stop
       debug('HttpServer: stop')
-      @thin.stop
-      @thin_thread.kill
+      @thin.stop unless @thin.running?
+      @thin_thread.kill unless @thin_thread.nil? || @thin_thread.status
     end
   end
 end

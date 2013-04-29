@@ -1,11 +1,8 @@
 module Bitstat
   class CLI
-    DAEMONS_COMMANDS = %w(start stop restart status)
-    CUSTOM_COMMANDS  = %w(info get_vps_data)
-    APP_NAME = 'bitstatd'
-
     def initialize(argv)
       parse_argv
+      initialize_term_handler
     end
 
     def run
@@ -19,7 +16,12 @@ module Bitstat
     end
 
     def parse_argv
-
+      #@app_name =
+      #@pid_dir =
+      #@force_kill_waittime =
+      #@command =
+      #@controller_options
+      #@host
     end
 
     def run_daemons(command)
@@ -31,16 +33,24 @@ module Bitstat
           :ARGV                => [command]
       }
 
-      Daemons.run_proc(APP_NAME, daemon_options) { controller.start }
+      Daemons.run_proc(@app_name, daemon_options) { controller.start }
     end
 
-    def send_to_controller(command, data)
-      response = RestClient.post("http://localhost:#@port/", (data).merge(:action => command))
+    def send_to_controller(command, data = {})
+      response_hash = sender.send((data).merge(:action => command))
       puts response
     end
 
     def controller
-      @controller ||= Controllew.new()
+      @controller ||= Controllew.new(:port => @port)
+    end
+
+    def sender
+      @sender ||= Sender.new(:port => @port, :host => @host)
+    end
+
+    def initialize_term_handler
+      Signal.trap('TERM') { controller.stop }
     end
   end
 end
