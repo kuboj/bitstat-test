@@ -6,14 +6,17 @@ module Bitstat
 
     def initialize(options)
       @options = options
-      @vestat_path   = options.fetch(:vestat_path)
-      @vzlist_fields = options.fetch(:vzlist_fields)
+      @vestat_path       = options.fetch(:vestat_path)
+      @vzlist_fields     = options.fetch(:vzlist_fields)
+      @nodes_config_path = options.fetch(:nodes_config_path)
+      @nodes             = {}
     end
 
     def start
-      collector.synchronize { set_data_provider(:vzlist,  vzlist) }
+      collector.set_data_provider(:vzlist,  vzlist)
       collector.set_data_provider(:cpubusy, cpubusy)
       ticker.start do
+        # TODO: send only signal to another thread to call collectors methods
         collector.regenerate
         collector.notify_all
       end
@@ -23,28 +26,38 @@ module Bitstat
       ticker.stop
     end
 
-    def reload
-      new, removed = @nodes.reload
-      new.each { |node| collector.set_data_provider(node.id, node) }
-      removed.each { |node| collector.delete_observer(node.id) }
+    def info(data)
+      #
     end
 
-    def info(data)
+    def reload
+      nodes = nodes_config.reload
+      nodes[:new].each do |id, node_config|
+        create_node(id, node_config)
+        collector.set_observer(id, @nodes[id])
+      end
 
+      nodes[:modified].each do |id, config_diff|
+        @nodes[id].reload(config_diff)
+      end
+
+      nodes[:deleted].each do |id, _|
+        delete_node(id)
+        collector.delete_observer(id)
+      end
+    end
+
+    def create_node(id, config)
+      # TODO
+    end
+
+    def delete_node(id)
+      # TODO
     end
 
     private
-    def nodes
-      @nodes ||= Nodes.new(@nodes_path)
-    end
-
     def collector
-      if @collector.nil?
-        @collector = Collector.new
-        @collector.extend(MonitorMixin)
-      else
-        @collector
-      end
+      @collector ||= Collector.new.extend(MonitorMixin)
     end
 
     def ticker
@@ -61,6 +74,10 @@ module Bitstat
 
     def cpubusy
       @cpubusy ||= Cpubusy.new(vestat)
+    end
+
+    def nodes_config
+      @nodes_config ||= NodesConfig.new(:path => @nodes_config_path)
     end
   end
 end
