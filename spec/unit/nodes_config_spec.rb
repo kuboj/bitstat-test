@@ -8,38 +8,145 @@ describe Bitstat::NodesConfig do
     end
   end
 
-  before do
-    @nodes_config = Bitstat::NodesConfig.new(:path => nil)
+  let(:nodes_config) { Bitstat::NodesConfig.new(:path => nil) }
+
+  describe '#watchers_diff' do
+    it 'returns hash with diff' do
+      new_config = {
+          :diskinodes => {
+              :up   => 'something',
+              :down => 'blah'
+          },
+          :cpubusy => {
+              :average => 'blahblah'
+          },
+          :physpages => {
+              :up      => 'hm',
+              :down    => 'hm'
+          }
+      }
+      old_config = {
+          :cpubusy => {
+              :up      => 'blah',
+              :down    => 'blahblah',
+              :average => 'will change'
+          },
+          :physpages => {
+              :average => 'meh',
+              :up      => 'hm',
+              :down    => 'hm'
+          }
+      }
+      expected = {
+          :new => {
+              :diskinodes => {
+                  :up   => 'something',
+                  :down => 'blah'
+              },
+              :cpubusy => {
+                  :average => 'blahblah'
+              }
+          },
+          :deleted => {
+              :physpages => {
+                  :average => 'meh'
+              },
+              :cpubusy => {
+                  :up      => 'blah',
+                  :down    => 'blahblah',
+                  :average => 'will change'
+              }
+          }
+      }
+
+      nodes_config.watchers_diff(new_config, old_config).should eql expected
+    end
   end
 
   describe '#diff' do
-    describe 'when given empty hash as second parameter' do
-      it 'returns first parameter and two empty hashes' do
-        h1 = { :a => 10, :b => { :c => 44 } }
-        h2 = {}
-        @nodes_config.diff(h1, h2).should eql [h1, {}, {}]
-      end
-    end
+    it 'returns diff' do
+      new_config = {
+          1 => {
+              :diskinodes => {
+                  :up   => 'something',
+                  :down => 'blah'
+              }
+          },
+          2 => {
+              :diskinodes => {
+                  :up   => 'something',
+                  :down => 'blah'
+              },
+              :cpubusy => {
+                  :average => 'blahblah'
+              },
+              :physpages => {
+                  :up      => 'hm',
+                  :down    => 'hm'
+              }
+          }
+      }
+      old_config = {
+          2 => {
+              :diskspace => {
+                  :average => 'mnaf'
+              },
+              :cpubusy => {
+                  :average => 'blahblah'
+              },
+              :physpages => {
+                  :up      => 'hmhm',
+                  :down    => 'hmhm'
+              }
+          },
+          3 => {
+              :diskinodes => {
+                  :up => 'blah'
+              }
+          }
+      }
+      expected = {
+          :new => {
+              1 => {
+                  :diskinodes => {
+                      :up   => 'something',
+                      :down => 'blah'
+                  }
+              }
+          },
+          :modified => {
+              2 => {
+                  :new => {
+                      :physpages => {
+                          :up      => 'hm',
+                          :down    => 'hm'
+                      },
+                      :diskinodes => {
+                          :up   => 'something',
+                          :down => 'blah'
+                      }
+                  },
+                  :deleted => {
+                      :diskspace => {
+                          :average => 'mnaf'
+                      },
+                      :physpages => {
+                          :up      => 'hmhm',
+                          :down    => 'hmhm'
+                      }
+                  }
+              }
+          },
+          :deleted => {
+              3 => {
+                  :diskinodes => {
+                      :up => 'blah'
+                  }
+              }
+          }
+      }
 
-    describe 'when given two hashes with different keys' do
-      it 'returns first one, empty hash and second one' do
-        h1 = { :a => 10, :b => { :c => 44 } }
-        h2 = { :g => 4 }
-        @nodes_config.diff(h1, h2).should eql [h1, {}, h2]
-      end
-    end
-
-    describe 'when given two hashes with overlapping keys' do
-      it 'returns hash with new keys, hash with modified keys and hash with keys only in second hash' do
-        h1 = { :new => 10, :modified => { :c => 44 } }
-        h2 = { :modified => 4, :deleted => 13 }
-
-        @nodes_config.diff(h1, h2).should eql [
-                                                  { :new => 10 },
-                                                  { :modified => { :c => 44 } },
-                                                  { :deleted => 13 }
-                                              ]
-      end
+      nodes_config.diff(new_config, old_config).should eql expected
     end
   end
 end

@@ -1,55 +1,58 @@
 module Bitstat
   class Node
     include Bitlogger::Loggable
+    attr_reader :watchers
 
     def initialize(options)
-      @id         = options.fetch(:id)
-      @config     = {}
-      @watchers   = {}
+      @id       = options.fetch(:id)
+      @watchers = {}
+      create_watchers(options.fetch(:watchers_config))
     end
 
-    def reload(new_config)
-      @config = new_config
-
-      @config.each do |parameter, watchers_diff|
-        watchers_diff[:new].each do |type, watcher_config|
-          (@watchers[parameter] ||= {})[type] = get_new_watcher(type, watcher_config)
-        end
-      end
-
-      parameters = @config.keys | @old_config.keys
-      parameters.each do |parameter| # :cpubusy, :diskinodes, ...
-        watcher_types = @config[parameter].keys | @old_config[parameter].keys
-        watcher_types.each do |type| # :up, :down, :average, ...
-          if @config.has_key?(parameter)
-      #      @config[parameter][type] ==
-          end
-        end
-      end
-
-
-      @config.each do |parameter, watchers|
-        watchers.each do |type, watcher_config|
-
-        end
-      end
+    def reload(config)
+      delete_watchers(config[:deleted])
+      create_watchers(config[:new])
     end
 
     def update(data)
-      @watchers.each do |parameter, specific_watchers|
-        specific_watchers.each_value do |watcher|
-          watcher.update(data[parameter])
+      @watchers.each do |parameter, watchers|
+        watchers.each_value do |watcher|
+          if data[parameter]
+            watcher.update(data[parameter])
+          else
+            warn("Node id=#@id, watcher #{parameter}:#{watcher.class.name}, data variable does not contain key for #{parameter}")
+          end
         end
       end
     end
 
-    #private
-    def watcher_config_diff(config1, config2)
-
+    def delete_watchers(config)
+      config.each do |parameter, watchers|
+        watchers.each do |watcher_type, watcher_config|
+          delete_watcher(parameter, watcher_type)
+        end
+      end
     end
 
-    def get_new_watcher(type, config)
-      Bitstat::Watchers.const_get(type.to_s.capitalize.cam)
+    def create_watchers(config)
+      config.each do |parameter, watchers|
+        watchers.each do |watcher_type, watcher_config|
+          create_watcher(parameter, watcher_type, watcher_config)
+        end
+      end
+    end
+
+    def delete_watcher(parameter, watcher_type)
+      @watchers[parameter].delete(watcher_type)
+      @watchers.delete(parameter) if @watchers[parameter].empty?
+    end
+
+    def create_watcher(parameter, watcher_type, watcher_config)
+      (@watchers[parameter] ||= {})[watcher_type] = get_watcher_class(watcher_type).new(watcher_config)
+    end
+
+    def get_watcher_class(type)
+      Bitstat::Watchers.const_get(type.to_s.capitalize.camelize)
     end
   end
 end

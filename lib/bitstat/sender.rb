@@ -20,16 +20,12 @@ module Bitstat
       end
       parse_response(response)
     rescue => e
-      require 'pp'
-
-      pp e
-      pp e.backtrace
       error("Error sending request (#{data.to_json} to #@url}", e)
       nil
     end
 
     def ssl?
-      @crt_path
+      !!@crt_path
     end
 
     def rc_send(data)
