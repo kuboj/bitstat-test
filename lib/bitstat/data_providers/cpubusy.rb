@@ -50,6 +50,9 @@ module Bitstat
       # via diff of underlaying values from Vestat, therefore two calls of
       # #regenerate are required to get :cpubusy values
       #
+      # NOTE: it is important that each data provider yields it's values under
+      #       unique key in `out` hash (e.g. :cpubusy here)
+      #
       # @example
       # cpubusy = Cpubusy.new(Vestat.new({ :path => '/proc/vz/vestat' }))
       # cpubusy.vpss

@@ -3,14 +3,16 @@ module Bitstat
     include Bitlogger::Loggable
 
     def initialize(options)
-      @options    = options
-      @port       = @options.fetch(:port)
-      @app_class  = @options.fetch(:app_class)
-      @callback   = @options.fetch(:callback)
+      @options   = options
+      @port      = @options.fetch(:port)
+      @app_class = @options.fetch(:app_class)
+      @callback  = @options.fetch(:callback)
+      @bind      = @options.fetch(:bind, 'localhost')
     end
 
     def start
       @app_class.set_callback(@callback)
+      @app_class.set(:bind, @bind)
       info("HttpServer: starting sinatra application on port #@port")
       @thin_thread = Thread.new do
         Rack::Handler::Thin.run(@app_class, { :Port => @port }) do |server|

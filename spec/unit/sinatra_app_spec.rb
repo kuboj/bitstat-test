@@ -14,7 +14,7 @@ describe Bitstat::SinatraApp do
     let!(:callback) { double() }
     let!(:data)     { { 'a' => 'b' } }
 
-    before { Bitstat::SinatraApp.set(:callback, callback) }
+    before { Bitstat::SinatraApp.set_callback(callback) }
 
     it 'receives returns action' do
       callback.should_receive(:call)
