@@ -17,6 +17,7 @@ require 'bitstat/node'
 require 'bitstat/nodes_config'
 require 'bitstat/sender'
 require 'bitstat/sinatra_app'
+require 'bitstat/signal_thread'
 require 'bitstat/version'
 
 require 'bitstat/data_providers/cpubusy'

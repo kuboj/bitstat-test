@@ -15,11 +15,7 @@ module Bitstat
     def start
       collector.set_data_provider(:vzlist,  vzlist)
       collector.set_data_provider(:cpubusy, cpubusy)
-      ticker.start do
-        # TODO: send only signal to another thread to call collectors methods
-        collector.regenerate
-        collector.notify_all
-      end
+      ticker.start { collector_thread.signal }
     end
 
     def stop
@@ -41,18 +37,18 @@ module Bitstat
         @nodes[id].reload(config_diff)
       end
 
-      nodes[:deleted].each do |id, _|
+      nodes[:deleted].each_key do |id|
         delete_node(id)
         collector.delete_observer(id)
       end
     end
 
     def create_node(id, config)
-      # TODO
+      @node[id] = Node.new(:watchers_config => config)
     end
 
     def delete_node(id)
-      # TODO
+      @node.delete(id)
     end
 
     private
@@ -78,6 +74,13 @@ module Bitstat
 
     def nodes_config
       @nodes_config ||= NodesConfig.new(:path => @nodes_config_path)
+    end
+
+    def collector_thread
+      @collector_thread ||= SignalThread.new do
+        collector.regenerate
+        collector.notify_all
+      end
     end
   end
 end
