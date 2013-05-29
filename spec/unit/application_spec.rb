@@ -90,10 +90,11 @@ describe Bitstat::Application do
       nodes_config.stub(:reload).and_return(config)
       node.stub(:reload)
       nodes.stub(:[]).and_return(node)
+      application.stub(:create_node)
+      application.stub(:delete_node)
     end
 
     it 'creates new nodes' do
-      application.stub(:delete_node)
       config[:new].each do |id, c|
         application.should_receive(:create_node).with(id, c)
         collector.should_receive(:set_observer)
@@ -102,7 +103,6 @@ describe Bitstat::Application do
     end
 
     it 'deletes nodes' do
-      application.stub(:create_node)
       config[:deleted].each do |id, c|
         application.should_receive(:delete_node).with(id)
         collector.should_receive(:delete_observer).with(id)
@@ -111,8 +111,6 @@ describe Bitstat::Application do
     end
 
     it 'reloads modified nodes' do
-      application.stub(:create_node)
-      application.stub(:delete_node)
       node.should_receive(:reload).with('blah')
       application.reload
     end
