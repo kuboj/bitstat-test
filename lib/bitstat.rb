@@ -8,6 +8,7 @@ APP_DIR = File.expand_path("#{File.dirname(__FILE__)}/../")
 Thread.abort_on_exception = true
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
+require 'bitstat/application'
 require 'bitstat/call_filter'
 require 'bitstat/collector'
 require 'bitstat/cli'
@@ -19,6 +20,7 @@ require 'bitstat/sender'
 require 'bitstat/sinatra_app'
 require 'bitstat/signal_thread'
 require 'bitstat/synchronized_proxy'
+require 'bitstat/ticker'
 require 'bitstat/version'
 
 require 'bitstat/data_providers/cpubusy'

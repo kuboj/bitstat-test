@@ -7,6 +7,7 @@ module Bitstat
       @vestat_path       = options.fetch(:vestat_path)
       @vzlist_fields     = options.fetch(:vzlist_fields)
       @nodes_config_path = options.fetch(:nodes_config_path)
+      @ticker_interval   = options.fetch(:ticker_interval)
     end
 
     def start
@@ -19,27 +20,24 @@ module Bitstat
       ticker.stop
     end
 
-    def info(data)
-      #
-    end
-
     def reload
-      nodes = nodes_config.reload
-      nodes[:new].each do |id, node_config|
+      nodes_diff = nodes_config.reload
+      nodes_diff[:new].each do |id, node_config|
         create_node(id, node_config)
         collector.set_observer(id, nodes[id])
       end
 
-      nodes[:modified].each do |id, config_diff|
+      nodes_diff[:modified].each do |id, config_diff|
         nodes[id].reload(config_diff)
       end
 
-      nodes[:deleted].each_key do |id|
+      nodes_diff[:deleted].each_key do |id|
         delete_node(id)
         collector.delete_observer(id)
       end
     end
 
+    private
     def create_node(id, config)
       nodes[id] = SynchronizedProxy(Node.new(:watchers_config => config))
     end
@@ -48,13 +46,12 @@ module Bitstat
       nodes.delete(id)
     end
 
-    private
     def collector
       @collector ||= SynchronizedProxy(Collector.new)
     end
 
     def ticker
-      @ticker ||= Ticker.new
+      @ticker ||= Ticker.new(@ticker_interval)
     end
 
     def vzlist
