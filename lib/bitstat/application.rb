@@ -2,14 +2,11 @@ module Bitstat
   class Application
     include Bitlogger::Loggable
 
-    # TODO: collector.synchronize { ... }
-
     def initialize(options)
       @options = options
       @vestat_path       = options.fetch(:vestat_path)
       @vzlist_fields     = options.fetch(:vzlist_fields)
       @nodes_config_path = options.fetch(:nodes_config_path)
-      @nodes             = {}
     end
 
     def start
@@ -30,11 +27,11 @@ module Bitstat
       nodes = nodes_config.reload
       nodes[:new].each do |id, node_config|
         create_node(id, node_config)
-        collector.set_observer(id, @nodes[id])
+        collector.set_observer(id, nodes[id])
       end
 
       nodes[:modified].each do |id, config_diff|
-        @nodes[id].reload(config_diff)
+        nodes[id].reload(config_diff)
       end
 
       nodes[:deleted].each_key do |id|
@@ -44,16 +41,16 @@ module Bitstat
     end
 
     def create_node(id, config)
-      @node[id] = Node.new(:watchers_config => config)
+      nodes[id] = SynchronizedProxy(Node.new(:watchers_config => config))
     end
 
     def delete_node(id)
-      @node.delete(id)
+      nodes.delete(id)
     end
 
     private
     def collector
-      @collector ||= Collector.new.extend(MonitorMixin)
+      @collector ||= SynchronizedProxy(Collector.new)
     end
 
     def ticker
@@ -74,6 +71,10 @@ module Bitstat
 
     def nodes_config
       @nodes_config ||= NodesConfig.new(:path => @nodes_config_path)
+    end
+
+    def nodes
+      @nodes ||= SynchronizedProxy.new({})
     end
 
     def collector_thread

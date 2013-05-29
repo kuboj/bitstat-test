@@ -3,8 +3,6 @@ module Bitstat
     include Bitlogger::Loggable
     attr_reader :watchers
 
-    # TODO: this class must be synchronized!
-
     def initialize(options)
       @id       = options.fetch(:id)
       @watchers = {}
@@ -12,8 +10,8 @@ module Bitstat
     end
 
     def reload(config)
-      delete_watchers(config[:deleted])
-      create_watchers(config[:new])
+      delete_watchers(config[:deleted]) if config[:deleted]
+      create_watchers(config[:new]) if config[:new]
     end
 
     def update(data)
