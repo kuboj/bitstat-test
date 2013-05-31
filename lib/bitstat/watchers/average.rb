@@ -9,11 +9,11 @@ module Bitstat
 
       # :count values have to be taken from #update until some average value
       # via #value can be provided
-      attr_accessor :count
+      attr_accessor :exceed_count
 
       def initialize(params)
         @interval            = params.fetch(:interval)
-        @count               = params.fetch(:count)
+        @exceed_count        = params.fetch(:exceed_count)
         @sum                 = 0
         @values_count        = 0
       end
@@ -25,7 +25,7 @@ module Bitstat
       call_only_each(:update, :@interval)
 
       def notify?
-        @values_count >= @count
+        @values_count >= @exceed_count
       end
 
       def value

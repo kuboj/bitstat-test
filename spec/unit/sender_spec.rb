@@ -47,7 +47,7 @@ describe Bitstat::Sender do
     end
   end
 
-  describe '#send' do
+  describe '#send_data' do
     class DummyServer < Sinatra::Base
       post '/halt' do
         $retries += 1
@@ -65,7 +65,7 @@ describe Bitstat::Sender do
           end
         end
 
-        sleep(0.1) until $thin.running?
+        sleep(0.1) until $thin && $thin.running?
 
         @sender = Bitstat::Sender.new(
             :url         => 'http://localhost:30000/halt',
@@ -76,7 +76,7 @@ describe Bitstat::Sender do
 
       it 'tries :count times to send data' do
         data = { :halt => 'mnaf' }
-        @sender.send(data).should be_nil
+        @sender.send_data(data).should be_nil
         $retries.should eql 5
       end
     end
@@ -108,7 +108,7 @@ describe Bitstat::Sender do
 
       it 'works' do
         expected = { :a => 1 }
-        @sender2.send(false).should eql expected
+        @sender2.send_data(false).should eql expected
       end
     end
   end

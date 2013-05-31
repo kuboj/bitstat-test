@@ -6,24 +6,25 @@ describe Bitstat::Application do
         :vestat_path       => nil,
         :vzlist_fields     => nil,
         :nodes_config_path => nil,
-        :ticker_interval   => nil
+        :ticker_interval   => nil,
+        :supervisor_url    => nil,
+        :verify_ssl        => nil,
+        :node_id           => nil,
+        :crt_path          => nil,
+        :max_retries       => nil,
+        :wait_time         => nil
     }
   }
 
   describe '#new' do
-    it 'takes 4 parameters' do
+    it 'takes many parameters' do
       expect { Bitstat::Application.new({}) }.to raise_error(IndexError)
       expect { Bitstat::Application.new(valid_args) }.not_to raise_error
     end
   end
 
   let(:application) {
-    Bitstat::Application.new({
-                                 :vestat_path       => nil,
-                                 :vzlist_fields     => nil,
-                                 :nodes_config_path => nil,
-                                 :ticker_interval   => nil
-                             })
+    Bitstat::Application.new(valid_args)
   }
   let(:collector)        { double() }
   let(:vzlist)           { double() }
@@ -32,6 +33,7 @@ describe Bitstat::Application do
   let(:collector_thread) { double() }
   let(:nodes_config)     { double() }
   let(:nodes)            { double() }
+  let(:notify_queue)     { double() }
 
   before do
     application.stub(:collector).and_return(collector)
@@ -41,6 +43,7 @@ describe Bitstat::Application do
     application.stub(:collector_thread).and_return(collector_thread)
     application.stub(:nodes_config).and_return(nodes_config)
     application.stub(:nodes).and_return(nodes)
+    application.stub(:notify_queue).and_return(notify_queue)
     collector_thread.stub(:signal)
     collector.stub(:set_data_provider)
     collector.stub(:set_observer)
@@ -113,6 +116,15 @@ describe Bitstat::Application do
     it 'reloads modified nodes' do
       node.should_receive(:reload).with('blah')
       application.reload
+    end
+  end
+
+  describe '#step' do
+    it 'gets new data, updates nodes and flushes queue' do
+      collector.should_receive(:regenerate)
+      collector.should_receive(:notify_all)
+      notify_queue.should_receive(:flush)
+      application.step
     end
   end
 end

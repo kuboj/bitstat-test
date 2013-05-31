@@ -11,5 +11,5 @@ gem 'rack-test',     '~>0.6.2'
 gem 'activesupport', '~>3.2.13', :require => 'active_support/core_ext/string/inflections'
 
 group(:test) do
-  gem 'rspec',     '~>2.12.0'
+  gem 'rspec',         '~>2.12.0'
 end

@@ -1,5 +1,4 @@
 require 'spec_helper'
-Thread.abort_on_exception = true
 
 describe Bitstat::SynchronizedProxy do
   describe '#new' do

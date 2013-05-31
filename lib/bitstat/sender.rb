@@ -4,13 +4,13 @@ module Bitstat
 
     def initialize(options)
       @url         = options.fetch(:url)
-      @verify_ssl  = options.fetch(:verify_ssl, false)
-      @crt_path    = options.fetch(:crt_path, nil)
+      @verify_ssl  = options.fetch(:verify_ssl,  false)
+      @crt_path    = options.fetch(:crt_path,    nil)
       @max_retries = options.fetch(:max_retries, 3)
-      @wait_time   = options.fetch(:wait_time, 1)
+      @wait_time   = options.fetch(:wait_time,   1)
     end
 
-    def send(data)
+    def send_data(data)
       response = nil
       success = try(:count  => @max_retries,
                     :wait   => @wait_time,
@@ -41,7 +41,7 @@ module Bitstat
       request = {
           :method  => :post,
           :url     => @url,
-          :payload => data # TODO: to_json ?
+          :payload => data
       }
 
       if ssl?

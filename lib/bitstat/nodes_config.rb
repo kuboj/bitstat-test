@@ -8,19 +8,16 @@ module Bitstat
       @path       = options.fetch(:path)
       @old_config = {}
       @config     = {}
+      super()
     end
 
     def reload
       self.synchronize do
         @old_config = @config
         File.open(@path) do |f|
-          debug("Trying to acquire file lock. PID=#{Process.pid}, Thread=#{Thread.current.inspect}.")
           f.flock(File::LOCK_EX)
-          debug("Lock acquired. PID=#{Process.pid}, Thread=#{Thread.current.inspect}.")
           @config = YAML::load(f).symbolize_string_keys
-          debug("Unlocking file. PID=#{Process.pid}, Thread=#{Thread.current.inspect}.")
           f.flock(File::LOCK_UN)
-          debug("File unlocked. PID=#{Process.pid}, Thread=#{Thread.current.inspect}.")
         end
 
         diff(@config, @old_config)

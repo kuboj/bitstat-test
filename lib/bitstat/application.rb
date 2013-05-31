@@ -8,6 +8,12 @@ module Bitstat
       @vzlist_fields     = options.fetch(:vzlist_fields)
       @nodes_config_path = options.fetch(:nodes_config_path)
       @ticker_interval   = options.fetch(:ticker_interval)
+      @supervisor_url    = options.fetch(:supervisor_url)
+      @verify_ssl        = options.fetch(:verify_ssl)
+      @node_id           = options.fetch(:node_id)
+      @crt_path          = options.fetch(:crt_path,    nil)
+      @max_retries       = options.fetch(:max_retries, nil)
+      @wait_time         = options.fetch(:wait_time,   nil)
     end
 
     def start
@@ -37,9 +43,19 @@ module Bitstat
       end
     end
 
+    def step
+      collector.regenerate
+      collector.notify_all
+      notify_queue.flush
+    end
+
     private
     def create_node(id, config)
-      nodes[id] = SynchronizedProxy(Node.new(:watchers_config => config))
+      nodes[id] = SynchronizedProxy.new(Node.new(
+                                            :id              => id,
+                                            :watchers_config => config,
+                                            :notify_queue    => notify_queue
+                                        ))
     end
 
     def delete_node(id)
@@ -47,7 +63,7 @@ module Bitstat
     end
 
     def collector
-      @collector ||= SynchronizedProxy(Collector.new)
+      @collector ||= SynchronizedProxy.new(Collector.new)
     end
 
     def ticker
@@ -75,10 +91,25 @@ module Bitstat
     end
 
     def collector_thread
-      @collector_thread ||= SignalThread.new do
-        collector.regenerate
-        collector.notify_all
-      end
+      @collector_thread ||= SignalThread.new { step }
+    end
+
+    def notify_queue
+      @notify_queue ||= NotifyQueue.new(
+          :sender  => sender,
+          :node_id => @node_id
+      )
+    end
+
+    def sender
+      options = {
+          :url        => @supervisor_url,
+          :verify_ssl => @verify_ssl
+      }
+      options[:wait_time]   = @wait_time   if @wait_time
+      options[:max_retries] = @max_retries if @max_retries
+      options[:crt_path]    = @crt_path    if @crt_path
+      @sender ||= Bitstat::Sender.new(options)
     end
   end
 end

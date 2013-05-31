@@ -9,6 +9,7 @@ describe Bitstat::SignalThread do
       st.signal
       st.signal
       st.signal
+      sleep(0.5)
     end
   end
 end

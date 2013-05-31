@@ -4,26 +4,41 @@ module Bitstat
     attr_reader :watchers
 
     def initialize(options)
-      @id       = options.fetch(:id)
-      @watchers = {}
+      @id           = options.fetch(:id)
+      @notify_queue = options.fetch(:notify_queue)
+      @watchers     = {}
       create_watchers(options.fetch(:watchers_config))
     end
 
     def reload(config)
       delete_watchers(config[:deleted]) if config[:deleted]
-      create_watchers(config[:new]) if config[:new]
+      create_watchers(config[:new])     if config[:new]
     end
 
     def update(data)
-      @watchers.each do |parameter, watchers|
-        watchers.each_value do |watcher|
+      data = data[@id]
+      @watchers.each do |parameter, watchers| # parameter can be for example :cpubusy or :physpages
+        watchers.each do |watcher_type, watcher| # watcher type - e.g. :up, :down, ...
           if data[parameter]
             watcher.update(data[parameter])
+            if watcher.notify?
+              add_notification(parameter, watcher_type, watcher.value)
+              watcher.reset
+            end
           else
             warn("Node id=#@id, watcher #{parameter}:#{watcher.class.name}, data variable does not contain key for #{parameter}")
           end
         end
       end
+    end
+
+    def add_notification(parameter, type, value)
+      @notify_queue << {
+          :node_id      => @id,
+          :parameter    => parameter,
+          :watcher_type => type,
+          :value        => value
+      }
     end
 
     def delete_watchers(config)

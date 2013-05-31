@@ -31,7 +31,7 @@ module Bitstat
     end
 
     def notify_all
-      notify_observers(get_data)
+      notify_observers(get_data) # TODO: refactor to parallel notification of observers
     end
 
     def set_observer(id, observer)
