@@ -17,13 +17,19 @@ module Bitstat
     end
 
     def start
-      collector.set_data_provider(:vzlist,  vzlist)
-      collector.set_data_provider(:cpubusy, cpubusy)
+      set_data_providers
       ticker.start { collector_thread.signal }
+      ticker.join
     end
 
     def stop
       ticker.stop
+      ticker.join
+    end
+
+    def stop!
+      ticker.stop!
+      ticker.join
     end
 
     def reload
@@ -43,6 +49,10 @@ module Bitstat
       end
     end
 
+    def node_info(node_id)
+      # TODO
+    end
+
     def step
       collector.regenerate
       collector.notify_all
@@ -50,6 +60,11 @@ module Bitstat
     end
 
     private
+    def set_data_providers
+      collector.set_data_provider(:vzlist,  vzlist)
+      collector.set_data_provider(:cpubusy, cpubusy)
+    end
+
     def create_node(id, config)
       nodes[id] = SynchronizedProxy.new(Node.new(
                                             :id              => id,

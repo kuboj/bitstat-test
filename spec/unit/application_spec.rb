@@ -49,6 +49,7 @@ describe Bitstat::Application do
     collector.stub(:set_observer)
     collector.stub(:delete_observer)
     ticker.stub(:start)
+    ticker.stub(:join)
     ticker.stub(:stop)
   end
 

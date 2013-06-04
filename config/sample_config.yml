@@ -5,11 +5,14 @@ bitstat:
   tick: 1
   # path to vestat file for counting cpubusy
   vestat_path: /proc/vz/vestat
-  # vzctl_version: 4.1
-  # vzlist_fields:
-  #  - physpages
-  #  - diskinodes
-  #  - diskspace
+  # fields to list in vzlist
+  vzlist_fields:
+    - physpages
+    - diskinodes
+  # id to identify this instance of bitstat
+  node_id: 1
+  # timeout after which will 'SIGKILL' be sent when stopping bitstat
+  force_kill_timeout: 30
 
 bitsuper:
   url: https://admin:admin@localhost:30000

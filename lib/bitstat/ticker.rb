@@ -4,11 +4,12 @@ module Bitstat
 
     def initialize(interval)
       @interval = interval
+      @stop     = false
     end
 
     def start(&block)
       @thread = Thread.new do
-        loop do
+        until @stop
           debug("Tick, #{Time.now.to_f}")
           block.call
           sleep(@interval)
@@ -17,7 +18,15 @@ module Bitstat
     end
 
     def stop
+      @stop = true
+    end
+
+    def stop!
       @thread.kill if @thread.alive?
+    end
+
+    def join
+      @thread.join if @thread.alive?
     end
   end
 end

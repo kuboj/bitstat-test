@@ -40,12 +40,13 @@ describe Bitstat do
       )
       app.stub(:cpubusy).and_return(cpubusy)
       app.send(:notify_queue)
-      app.instance_variable_get(:@notify_queue).should_receive(:send_notifications).with([[1,:cpubusy, :up, 84], [2, :cpubusy, :average ,30.0]])
+      app.instance_variable_get(:@notify_queue).should_receive(:send_notifications).with([[1,:cpubusy, :up, 84], [2, :cpubusy, :average, 30.0]])
 
       app.reload
-      app.start
-      sleep 0.3
-      app.stop
+      app.send(:set_data_providers)
+      app.step
+      app.step
+      app.step
     end
   end
 end

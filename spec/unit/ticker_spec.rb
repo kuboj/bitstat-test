@@ -30,14 +30,30 @@ describe Bitstat::Ticker do
   describe '#stop' do
     let(:m) { Mutex.new }
 
-    it 'stops execution of block given in #start' do
+    it 'prevents from next execution of block given in #start' do
       i = 0
-      ticker.start { m.synchronize { i += 1 } }
-      sleep(0.2)
-      current_i = m.synchronize { i }
+      ticker.start do
+        sleep 0.3
+        m.synchronize { i = 1 }
+      end
       ticker.stop
-      sleep(0.2)
-      current_i.should eql i
+      ticker.join
+      m.synchronize { i }.should eql 1
+    end
+  end
+
+  describe '#stop!' do
+    let(:m) { Mutex.new }
+
+    it 'kills inner ticker thread' do
+      i = 0
+      ticker.start do
+        sleep 1
+        m.synchronize { i = 1 }
+      end
+      ticker.stop!
+      ticker.join
+      m.synchronize { i }.should eql 0
     end
   end
 end

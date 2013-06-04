@@ -33,8 +33,11 @@ module Bitstat
     end
 
     def parse_response(response)
-      return response if response.nil?
+      return {} if response.nil?
       JSON.parse(response).symbolize_string_keys
+    rescue => e
+      error("Error while parsing json #{e.class.name}:#{e.message}", e)
+      {}
     end
 
     def get_request(data)
