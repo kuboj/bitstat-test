@@ -9,8 +9,11 @@ module Bitstat
       parse_args(args)
       @options = @options.merge(load_config(@options[:config_path]))
       $DEBUG = @options[:devel][:debug]
-      initialize_term_handler
       initialize_bitlogger
+      # initialize Application - therefore Thin and Sinatra will register their
+      # SIGINT ant SIGTERM handlers so we can overwrite them
+      controller.application
+      initialize_term_handler
     end
 
     def default_options
@@ -116,7 +119,15 @@ module Bitstat
     end
 
     def initialize_term_handler
-      Signal.trap('TERM') { controller.stop }
+      Signal.trap('TERM') do
+        debug('Got SIGTERM')
+        controller.stop
+      end
+
+      Signal.trap('INT') do
+        debug('Got SIGINT')
+        controller.stop
+      end
     end
 
     def initialize_bitlogger

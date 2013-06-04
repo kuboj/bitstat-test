@@ -35,15 +35,14 @@ module Bitstat
       { :code => 0 }
     end
 
-    private
+    def application
+      @application ||= Application.new(@application_options)
+    end
+
     def server
       @server ||= HttpServer.new(:app_class => @app_class,
                                  :port      => @port,
                                  :callback  => Proc.new { |params| on_request(params) })
-    end
-
-    def application
-      @application ||= Application.new(@application_options)
     end
 
     def on_request(params)
