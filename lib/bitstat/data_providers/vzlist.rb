@@ -19,7 +19,8 @@ module Bitstat
       end
 
       def parse_line(line)
-        Hash[@fields.zip(line.split(' '))]
+        # TODO: we are assuming that all values from vzlist are numbers
+        Hash[@fields.zip(line.map(&:to_i).split(' '))]
       end
 
       def get_vzlist_output
