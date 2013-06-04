@@ -15,6 +15,7 @@ module Bitstat
       debug('Controller: start')
       server.start
       application.start
+      application.reload
     end
 
     def join
