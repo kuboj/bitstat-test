@@ -12,7 +12,7 @@ bitstat:
   # id to identify this instance of bitstat
   node_id: 1
   # timeout after which will 'SIGKILL' be sent when stopping bitstat
-  force_kill_timeout: 30
+  force_kill_waittime: 30
 
 bitsuper:
   url: https://admin:admin@localhost:30000
