@@ -30,7 +30,7 @@ module Bitstat
       if DAEMONS_COMMANDS.include?(@options[:command])
         run_daemons(@options[:command])
       elsif CUSTOM_COMMANDS.include?(@options[:command])
-        send_to_controller(@options[:command], @data)
+        send_to_controller(@options[:command])
       end
     end
 
