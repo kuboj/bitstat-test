@@ -43,6 +43,10 @@ module Bitstat
     end
 
     def notify_observers(data)
+      s = ''
+      data.each { |k, v| s += "#{k} => #{v}\n"}
+      debug("Collector#notify_observers\n\t#{s}")
+
       @observers.values.each { |observer| observer.update(data) }
     end
   end
