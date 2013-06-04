@@ -116,7 +116,7 @@ module Bitstat
     end
 
     def sender
-      @sender ||= Sender.new("http://localhost:#{@options[:port]}")
+      @sender ||= Sender.new(:url => "http://localhost:#{@options[:port]}")
     end
 
     def initialize_term_handler
