@@ -17,22 +17,26 @@ module Bitstat
     end
 
     def start
+      debug('Application: start')
       set_data_providers
       ticker.start { collector_thread.signal }
       ticker.join
     end
 
     def stop
+      debug('Application: stop')
       ticker.stop
       ticker.join
     end
 
     def stop!
+      debug('Application: stop!')
       ticker.stop!
       ticker.join
     end
 
     def reload
+      debug('Application: reload')
       nodes_diff = nodes_config.reload
       nodes_diff[:new].each do |id, node_config|
         create_node(id, node_config)
@@ -66,6 +70,7 @@ module Bitstat
     end
 
     def create_node(id, config)
+      debug("Creating node #{id}")
       nodes[id] = SynchronizedProxy.new(Node.new(
                                             :id              => id,
                                             :watchers_config => config,
@@ -74,6 +79,7 @@ module Bitstat
     end
 
     def delete_node(id)
+      debug("Deleting node #{id}")
       nodes.delete(id)
     end
 

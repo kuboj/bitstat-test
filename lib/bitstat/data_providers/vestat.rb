@@ -10,7 +10,7 @@ module Bitstat
 
       def regenerate
         @vpss = []
-        get_vestat_output.each_line do |l|
+        get_vestat_output.each do |l|
           next if skip_line?(l)
           veid, user, nice, system, idle = parse_line(l)
           @vpss << {

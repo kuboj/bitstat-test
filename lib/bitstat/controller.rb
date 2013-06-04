@@ -12,11 +12,13 @@ module Bitstat
 
     # NOTE: blocking call
     def start
+      debug('Controller: start')
       server.start
       application.start
     end
 
     def stop
+      debug('Controller: stop')
       server.stop
       application.stop
       { :code => 0 }
@@ -28,6 +30,7 @@ module Bitstat
     end
 
     def reload
+      debug('Controller: reload')
       application.reload
       { :code => 0 }
     end
