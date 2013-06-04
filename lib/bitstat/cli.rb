@@ -100,7 +100,7 @@ module Bitstat
 
     def controller
       @controller ||= Controller.new(
-          :port                => @options[:port],
+          :port                => @options[:bitstat][:port],
           :app_class           => Bitstat::SinatraApp,
           :application_options => {
               :vestat_path       => @options[:bitstat][:vestat_path],
@@ -116,7 +116,7 @@ module Bitstat
     end
 
     def sender
-      @sender ||= Sender.new(:url => "http://localhost:#{@options[:port]}")
+      @sender ||= Sender.new(:url => "http://localhost:#{@options[:bitstat][:port]}")
     end
 
     def initialize_term_handler
