@@ -10,9 +10,9 @@ module Bitstat
       @options = @options.merge(load_config(@options[:config_path]))
       $DEBUG = @options[:devel][:debug]
       initialize_bitlogger
-      # initialize Application - therefore Thin and Sinatra will register their
+      # initialize HttpServer - therefore Thin and Sinatra will register their
       # SIGINT ant SIGTERM handlers so we can overwrite them
-      controller.application
+      controller.server
       initialize_term_handler
     end
 
