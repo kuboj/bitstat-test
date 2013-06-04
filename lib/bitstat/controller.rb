@@ -17,6 +17,10 @@ module Bitstat
       application.start
     end
 
+    def join
+      application.join
+    end
+
     def stop
       debug('Controller: stop')
       server.stop

@@ -20,7 +20,6 @@ module Bitstat
       debug('Application: start')
       set_data_providers
       ticker.start { collector_thread.signal }
-      ticker.join
     end
 
     def stop
@@ -61,6 +60,10 @@ module Bitstat
       collector.regenerate
       collector.notify_all
       notify_queue.flush
+    end
+
+    def join
+      ticker.join
     end
 
     private

@@ -10,10 +10,6 @@ module Bitstat
       @options = @options.merge(load_config(@options[:config_path]))
       $DEBUG = @options[:devel][:debug]
       initialize_bitlogger
-      # initialize HttpServer - therefore Thin and Sinatra will register their
-      # SIGINT ant SIGTERM handlers so we can overwrite them
-      controller.server
-      initialize_term_handler
     end
 
     def default_options
@@ -48,7 +44,11 @@ module Bitstat
           :ARGV                => [command]
       }
 
-      Daemons.run_proc(@options[:app_name], daemon_options) { controller.start }
+      Daemons.run_proc(@options[:app_name], daemon_options) do
+        controller.start
+        initialize_term_handler
+        controller.join
+      end
     end
 
     def send_to_controller(action, options = {})
