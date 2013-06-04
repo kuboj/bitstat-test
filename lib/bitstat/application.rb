@@ -86,15 +86,15 @@ module Bitstat
     end
 
     def vzlist
-      @vzlist ||= Vzlist.new(:fields => @vzlist_fields)
+      @vzlist ||= DataProviders::Vzlist.new(:fields => @vzlist_fields)
     end
 
     def vestat
-      @vestat ||= Vestat.new(:path => @vestat_path)
+      @vestat ||= DataProviders::Vestat.new(:path => @vestat_path)
     end
 
     def cpubusy
-      @cpubusy ||= Cpubusy.new(vestat)
+      @cpubusy ||= DataProviders::Cpubusy.new(vestat)
     end
 
     def nodes_config
