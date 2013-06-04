@@ -8,7 +8,6 @@ module Bitstat
       @options = default_options
       parse_args(args)
       @options = @options.merge(load_config(@options[:config_path]))
-      $DEBUG = @options[:devel][:debug]
       initialize_bitlogger
     end
 
@@ -45,6 +44,7 @@ module Bitstat
       }
 
       Daemons.run_proc(@options[:app_name], daemon_options) do
+        $DEBUG = @options[:devel][:debug]
         controller.start
         initialize_term_handler
         controller.join
@@ -52,6 +52,7 @@ module Bitstat
     end
 
     def send_to_controller(action, options = {})
+      $DEBUG = @options[:devel][:debug]
       controller_request = { :request => (options.merge(:action => action)).to_json }
       sender.send_data(controller_request)
     end
@@ -119,15 +120,8 @@ module Bitstat
     end
 
     def initialize_term_handler
-      Signal.trap('TERM') do
-        debug('Got SIGTERM')
-        controller.stop
-      end
-
-      Signal.trap('INT') do
-        debug('Got SIGINT')
-        controller.stop
-      end
+      Signal.trap('TERM') { controller.stop }
+      Signal.trap('INT')  { controller.stop }
     end
 
     def initialize_bitlogger
