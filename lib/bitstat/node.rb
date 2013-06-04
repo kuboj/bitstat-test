@@ -26,7 +26,7 @@ module Bitstat
               watcher.reset
             end
           else
-            warn("Node id=#@id, watcher #{parameter}:#{watcher.class.name}, data variable does not contain key for #{parameter}")
+            warn("Node id=#@id, watcher #{parameter}:#{watcher.class.name}, data variable does not contain key for #{parameter} (keys: [#{data.keys.join(', ')}])")
           end
         end
       end
