@@ -43,8 +43,8 @@ describe Bitstat::DataProviders::Vzlist do
     it 'parses vzlist output and returns hash with symbolized keys passed in constructor' do
       vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages hostname) })
       expected = {
-          :veid      => '721',
-          :physpages => '52435',
+          :veid      => 721,
+          :physpages => 52435,
           :hostname  => 'crn721.c173.prg1.relbit.com'
       }
       vzlist.parse_line(' 721      52435 crn721.c173.prg1.relbit.com').should eql expected
@@ -53,8 +53,8 @@ describe Bitstat::DataProviders::Vzlist do
     it 'it returns nil for fields which cannot be parsed' do
       vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages hostname) })
       expected = {
-          :veid      => '721',
-          :physpages => '52435',
+          :veid      => 721,
+          :physpages => 52435,
           :hostname  => nil
       }
       vzlist.parse_line(' 721      52435   ').should eql expected
@@ -73,9 +73,9 @@ describe Bitstat::DataProviders::Vzlist do
       vzlist.stub(:get_vzlist_output => vzlist_text)
       vzlist.regenerate
       expect { |b| vzlist.each_vps(&b) }.to yield_successive_args(
-          { :veid => '711', :physpages => '42851'},
-          { :veid => '713', :physpages => '38662'},
-          { :veid => '715', :physpages => '63114'}
+          { :veid => 711, :physpages => 42851 },
+          { :veid => 713, :physpages => 38662 },
+          { :veid => 715, :physpages => 63114 }
       )
     end
   end
@@ -92,9 +92,9 @@ describe Bitstat::DataProviders::Vzlist do
       vzlist.stub(:get_vzlist_output => vzlist_text)
       vzlist.regenerate
       expected_hash = {
-          711 => { :physpages => '42851' },
-          713 => { :physpages => '38662' },
-          715 => { :physpages => '63114' }
+          711 => { :physpages => 42851 },
+          713 => { :physpages => 38662 },
+          715 => { :physpages => 63114 }
       }
       vzlist.vpss.should eql expected_hash
     end
