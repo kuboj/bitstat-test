@@ -1,0 +1,20 @@
+# ignore everything in log and pids directory, but keep it
+pid/*
+!pid/.gitignore
+log/*
+!log/.gitignore
+
+# temporary dir
+tmp/
+
+# config
+config/config.yml
+config/nodes.yml
+config/original_config.yml
+
+# JetBrains RubyMine files
+.idea
+
+# vim temporary files
+*.swp
+*.swo
