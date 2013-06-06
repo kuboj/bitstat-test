@@ -18,7 +18,7 @@ module Bitstat
 
     def start
       debug('Application: start')
-      set_data_providers
+      #set_data_providers
       ticker.start { collector_thread.signal }
     end
 
