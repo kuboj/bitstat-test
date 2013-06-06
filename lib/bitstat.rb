@@ -26,6 +26,7 @@ require 'bitstat/version'
 require 'bitstat/data_providers/cpubusy'
 require 'bitstat/data_providers/vestat'
 require 'bitstat/data_providers/vzlist'
+require 'bitstat/data_providers/physpages'
 
 require 'bitstat/watchers/average'
 require 'bitstat/watchers/down'

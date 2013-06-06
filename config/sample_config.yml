@@ -5,9 +5,11 @@ bitstat:
   tick: 1
   # path to vestat file for counting cpubusy
   vestat_path: /proc/vz/vestat
+  # path to user bean resources
+  resources_path: /proc/bc/resources
   # fields to list in vzlist
   vzlist_fields:
-    - physpages
+    - diskspace
     - diskinodes
   # id to identify this instance of bitstat
   node_id: 1

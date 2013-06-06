@@ -1,0 +1,12 @@
+1:
+  cpubusy:
+    up:
+      threshold:    80
+      exceed_count: 3
+      aging:        0.1
+      interval:     1
+2:
+  cpubusy:
+    average:
+      interval:     1
+      exceed_count: 3
