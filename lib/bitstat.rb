@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'bundler'
 require 'yaml'
-require 'rack/test'
 Bundler.require(:default)
 
 APP_DIR = File.expand_path("#{File.dirname(__FILE__)}/../")
