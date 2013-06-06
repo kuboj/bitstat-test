@@ -19,6 +19,14 @@ module Bitstat
     end
 
     def send_notifications(notifications)
+      debug_string = ''
+      if notifications.empty?
+        debug_string = '[]'
+      else
+        debug_string = "#{notifications.inject("") { |s, n| s << "\n\t" << n.inspect }}\n"
+      end
+      debug("Notifications: #{debug_string}")
+
       @sender.send_data(format_data(notifications))
     end
 
