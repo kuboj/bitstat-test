@@ -8,7 +8,6 @@ module Bitstat
       @options = default_options
       parse_args(args)
       @options = @options.merge(load_config(@options[:config_path]))
-      initialize_bitlogger
     end
 
     def default_options
@@ -44,6 +43,7 @@ module Bitstat
       }
 
       Daemons.run_proc(@options[:app_name], daemon_options) do
+        initialize_bitlogger
         $DEBUG = @options[:devel][:debug]
         controller.start
         initialize_term_handler
