@@ -39,10 +39,13 @@ module Bitstat
       def calculate_all(nodes)
         out = []
         nodes.each do |node|
-          out.push({ :physpages => calculate_physpages(
-                                      node[:swappages],
-                                      node[:kmemsize],
-                                      node[:oomguarpages]),
+          out.push({ :physpages => physpages_to_mb(
+                                       calculate_physpages(
+                                           node[:swappages],
+                                           node[:kmemsize],
+                                           node[:oomguarpages]
+                                       )
+                                   ),
                      :veid      => node[:veid] })
         end
 
@@ -51,6 +54,10 @@ module Bitstat
 
       def calculate_physpages(swappages, kmemsize, oomguarpages)
         (kmemsize / 1024) + (oomguarpages - swappages) * 4
+      end
+
+      def physpages_to_mb(pp)
+        pp / 256
       end
 
       def each_vps(&block)
