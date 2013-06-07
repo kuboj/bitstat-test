@@ -13,6 +13,7 @@ module Bitstat
     def default_options
       {
           :config_path       => "#{APP_DIR}/config/config.yml",
+          :crash_log_path    => "#{APP_DIR}/log/crash.log",
           :pid_dir           => "#{APP_DIR}/pid/",
           :nodes_config_path => "#{APP_DIR}/config/nodes.yml",
           :app_name          => 'bitstat'
@@ -44,6 +45,7 @@ module Bitstat
 
       Daemons.run_proc(@options[:app_name], daemon_options) do
         initialize_bitlogger
+        initialize_exit_handler
         $DEBUG = @options[:devel][:debug]
         controller.start
         initialize_term_handler
@@ -139,5 +141,24 @@ module Bitstat
       end
       Bitlogger.init(logging_options)
     end
+
+    def initialize_exit_handler
+      at_exit do
+        if $! && $!.class != SystemExit # if exception was thrown
+          log_dir = File.dirname(@options[:crash_log_path])
+          FileUtils.mkdir_p(log_dir) unless File.exists?(log_dir)
+          open(@options[:crash_log_path], 'a')  do |log|
+            error = {
+                :timestamp => Time.now,
+                :error     => $!.class.name,
+                :message   => $!.message,
+                :backtrace => $!.backtrace
+            }
+            YAML.dump(error, log)
+          end
+        end
+      end
+    end
+
   end
 end
