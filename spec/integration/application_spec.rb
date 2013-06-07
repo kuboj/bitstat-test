@@ -7,6 +7,7 @@ describe Bitstat do
           :vestat_path       => nil,
           :vzlist_fields     => nil,
           :nodes_config_path => "#{APP_DIR}/spec/integration/config/nodes.yml",
+          :resources_path    => nil,
           :ticker_interval   => 0.1,
           :supervisor_url    => nil,
           :verify_ssl        => false,
@@ -17,11 +18,22 @@ describe Bitstat do
       vzlist.stub(:regenerate)
       vzlist.stub(:vpss).and_return(
           {
-              1 => { :physpages => 1000, :diskinodes => 2000 },
-              2 => { :physpages => 5000, :diskinodes => 1000 }
+              1 => { :diskinodes => 2000 },
+              2 => { :diskinodes => 1000 }
           }
       )
       app.stub(:vzlist).and_return(vzlist)
+
+      physpages = double('physpages')
+      physpages.stub(:regenerate)
+      physpages.stub(:vpss).and_return(
+          {
+              1 => { :physpages => 1000 },
+              2 => { :physpages => 5000 }
+          }
+      )
+      app.stub(:physpages).and_return(physpages)
+
       cpubusy = double('cpubusy')
       cpubusy.stub(:regenerate)
       cpubusy.stub(:vpss).and_return(
