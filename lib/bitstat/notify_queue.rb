@@ -4,7 +4,7 @@ module Bitstat
     extend Forwardable
     def_delegators :@queue, :<<, :push
 
-    NOTIFY_ACTION = 'bitstat'
+    NOTIFY_ACTION = 'bitstatvz'
 
     def initialize(options)
       @sender  = options.fetch(:sender)
