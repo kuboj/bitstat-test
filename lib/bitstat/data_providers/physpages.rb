@@ -51,7 +51,7 @@ module Bitstat
       end
 
       def calculate_mb(swappages, kmemsize, oomguarpages)
-        ((kmemsize / 1024) + (oomguarpages - swappages) * 4) / 1024
+        (((kmemsize / 1024) + (oomguarpages - swappages) * 4) / 1024).to_i
       end
 
       def each_vps(&block)
