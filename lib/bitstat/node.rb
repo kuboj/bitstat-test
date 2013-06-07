@@ -39,6 +39,7 @@ module Bitstat
     end
 
     def add_notification(parameter, type, value)
+      debug("Node id=#@id, notification. #{parameter}, #{type}, #{value}")
       @notify_queue << {
           :node_id      => @id,
           :parameter    => parameter,
