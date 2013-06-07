@@ -99,4 +99,24 @@ describe Bitstat::DataProviders::Vzlist do
       vzlist.vpss.should eql expected_hash
     end
   end
+
+  describe '#sanitize_values' do
+    it 'converts diskspace value from KB to MB' do
+      vzlist_text = <<-VZLIST
+       711      42851    1363712
+       713      38662    1245312
+       715      63114    1425212
+      VZLIST
+
+      vzlist = Bitstat::DataProviders::Vzlist.new({ :fields => %w(physpages diskspace) })
+      vzlist.stub(:get_vzlist_output => vzlist_text)
+      vzlist.regenerate
+      expected_hash = {
+          711 => { :physpages => 42851, :diskspace => 1331 },
+          713 => { :physpages => 38662, :diskspace => 1216 },
+          715 => { :physpages => 63114, :diskspace => 1391 }
+      }
+      vzlist.vpss.should eql expected_hash
+    end
+  end
 end

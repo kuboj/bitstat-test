@@ -19,7 +19,7 @@ module Bitstat
       end
 
       def parse_line(line)
-        Hash[@fields.zip(line.split(' ').map { |i| i == i.to_i.to_s ? i.to_i : i})]
+        sanitize_values(Hash[@fields.zip(line.split(' ').map { |i| i == i.to_i.to_s ? i.to_i : i})])
       end
 
       def get_vzlist_output
@@ -28,6 +28,14 @@ module Bitstat
 
       def each_vps(&block)
         @vpss.each { |vps| block.call(vps) }
+      end
+
+      def sanitize_values(data)
+        if data.has_key?(:diskspace)
+          data[:diskspace] = data[:diskspace] / 1024 # convert kilobytes to megabytes
+        end
+
+        data
       end
 
       # Returns hash of vpss indexed by vps id. Each vps is represented
