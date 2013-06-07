@@ -42,7 +42,7 @@ module Bitstat
       end
 
       def calculate_load(data)
-        100.0 - data[:idle] * 100.0 / (100.0**3 * (data[:user] + data[:nice] + data[:system]) + data[:idle])
+        (100.0 - data[:idle] * 100.0 / (100.0**3 * (data[:user] + data[:nice] + data[:system]) + data[:idle])).to_i
       end
 
       # Returns hash of vpss indexed by vps id. Each vps is represented
