@@ -106,6 +106,7 @@ module Bitstat
               :vestat_path       => @options[:bitstat][:vestat_path],
               :vzlist_fields     => @options[:bitstat][:vzlist_fields],
               :nodes_config_path => @options[:nodes_config_path],
+              :resources_path    => @options[:bitstat][:resources_path],
               :ticker_interval   => @options[:bitstat][:tick],
               :supervisor_url    => @options[:bitsuper][:url],
               :verify_ssl        => @options[:bitsuper][:verify_crt],

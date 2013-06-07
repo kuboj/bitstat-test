@@ -7,6 +7,7 @@ module Bitstat
       @vestat_path       = options.fetch(:vestat_path)
       @vzlist_fields     = options.fetch(:vzlist_fields)
       @nodes_config_path = options.fetch(:nodes_config_path)
+      @resources_path    = options.fetch(:resources_path)
       @ticker_interval   = options.fetch(:ticker_interval)
       @supervisor_url    = options.fetch(:supervisor_url)
       @verify_ssl        = options.fetch(:verify_ssl)
@@ -68,8 +69,9 @@ module Bitstat
 
     private
     def set_data_providers
-      collector.set_data_provider(:vzlist,  vzlist)
-      collector.set_data_provider(:cpubusy, cpubusy)
+      collector.set_data_provider(:vzlist,    vzlist)
+      collector.set_data_provider(:cpubusy,   cpubusy)
+      collector.set_data_provider(:physpages, physpages)
     end
 
     def create_node(id, config)
@@ -104,6 +106,10 @@ module Bitstat
 
     def cpubusy
       @cpubusy ||= DataProviders::Cpubusy.new(vestat)
+    end
+
+    def physpages
+      @physpages ||= DataProviders::Physpages.new(:resources_path => @resources_path)
     end
 
     def nodes_config

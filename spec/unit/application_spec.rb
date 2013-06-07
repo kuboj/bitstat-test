@@ -6,6 +6,7 @@ describe Bitstat::Application do
         :vestat_path       => nil,
         :vzlist_fields     => nil,
         :nodes_config_path => nil,
+        :resources_path    => nil,
         :ticker_interval   => nil,
         :supervisor_url    => nil,
         :verify_ssl        => nil,
@@ -29,6 +30,7 @@ describe Bitstat::Application do
   let(:collector)        { double() }
   let(:vzlist)           { double() }
   let(:cpubusy)          { double() }
+  let(:physpages)        { double() }
   let(:ticker)           { double() }
   let(:collector_thread) { double() }
   let(:nodes_config)     { double() }
@@ -39,6 +41,7 @@ describe Bitstat::Application do
     application.stub(:collector).and_return(collector)
     application.stub(:vzlist).and_return(vzlist)
     application.stub(:cpubusy).and_return(cpubusy)
+    application.stub(:physpages).and_return(physpages)
     application.stub(:ticker).and_return(ticker)
     application.stub(:collector_thread).and_return(collector_thread)
     application.stub(:nodes_config).and_return(nodes_config)
@@ -57,6 +60,7 @@ describe Bitstat::Application do
     it 'sets data providers to collector and starts ticker' do
       collector.should_receive(:set_data_provider).with(:vzlist, vzlist)
       collector.should_receive(:set_data_provider).with(:cpubusy, cpubusy)
+      collector.should_receive(:set_data_provider).with(:physpages, physpages)
       ticker.should_receive(:start)
       application.start
     end

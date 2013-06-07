@@ -3,8 +3,8 @@ module Bitstat
     class Physpages
       include Bitlogger::Loggable
 
-      def initialize(resources_path)
-        @resources_path = resources_path
+      def initialize(options)
+        @resources_path = options.fetch(:resources_path)
         @vpss           = {}
       end
 
