@@ -33,7 +33,7 @@ describe Bitstat::Watchers::Up do
 
   describe '#notify?' do
     it 'returns true if threshold had been hit exactly exceed_count times' do
-      @up.update(80)
+      @up.update(81)
       @up.notify?.should be_false
       @up.update(20) # ignored
       @up.notify?.should be_false
@@ -44,7 +44,7 @@ describe Bitstat::Watchers::Up do
     end
 
     it 'returns true if threshold had been hit more than exceed_count times' do
-      @up.update(80)
+      @up.update(81)
       @up.notify?.should be_false
       @up.update(20) # ignored
       @up.notify?.should be_false

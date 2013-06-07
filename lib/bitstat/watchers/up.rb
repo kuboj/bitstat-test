@@ -17,7 +17,7 @@ module Bitstat
 
       def update(value)
         @last_value = value
-        @count += 1 if @last_value >= @threshold
+        @count += 1 if @last_value > @threshold
       end
       call_only_each(:update, :@interval)
 
