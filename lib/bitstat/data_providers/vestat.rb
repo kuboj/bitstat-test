@@ -34,6 +34,9 @@ module Bitstat
 
       def get_vestat_output
         File.readlines(@path)
+      rescue Errno::ENOENT => e
+        warn("File #@path does not exist, retrying ...")
+        retry
       end
 
       def each_vps(&block)

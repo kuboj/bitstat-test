@@ -34,6 +34,9 @@ module Bitstat
 
       def get_file_contents(path)
         File.readlines(path)
+      rescue Errno::ENOENT => e
+        warn("File #{path} does not exist, retrying ...")
+        retry
       end
 
       def calculate_all(nodes)
