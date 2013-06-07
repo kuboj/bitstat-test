@@ -29,7 +29,7 @@ module Bitstat
       end
 
       def value
-        @values_count.zero? ? 0 : (@sum / @values_count)
+        @values_count.zero? ? 0 : (@sum / @values_count).to_i
       end
 
       def reset
