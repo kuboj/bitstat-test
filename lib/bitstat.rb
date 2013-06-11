@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'bundler'
 require 'yaml'
-require 'rack/test'
 Bundler.require(:default)
 
 APP_DIR = File.expand_path("#{File.dirname(__FILE__)}/../")
@@ -27,6 +26,7 @@ require 'bitstat/version'
 require 'bitstat/data_providers/cpubusy'
 require 'bitstat/data_providers/vestat'
 require 'bitstat/data_providers/vzlist'
+require 'bitstat/data_providers/physpages'
 
 require 'bitstat/watchers/average'
 require 'bitstat/watchers/down'

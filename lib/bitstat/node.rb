@@ -16,7 +16,13 @@ module Bitstat
     end
 
     def update(data)
-      data = data[@id]
+      if data.has_key?(@id)
+        data = data[@id]
+      else
+        info("Node id=#@id. data variable does not contain anything for this node.")
+        return
+      end
+
       @watchers.each do |parameter, watchers| # parameter can be for example :cpubusy or :physpages
         watchers.each do |watcher_type, watcher| # watcher type - e.g. :up, :down, ...
           if data[parameter]
@@ -33,6 +39,7 @@ module Bitstat
     end
 
     def add_notification(parameter, type, value)
+      debug("Node id=#@id, notification. #{parameter}, #{type}, #{value}")
       @notify_queue << {
           :node_id      => @id,
           :parameter    => parameter,

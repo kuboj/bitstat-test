@@ -40,7 +40,7 @@ describe Bitstat::Watchers::Average do
       @average.update(30) # ignored
       @average.update(50)
       @average.reset
-      @average.value.should eql 0.0
+      @average.value.should eql 0
     end
   end
 
@@ -50,11 +50,11 @@ describe Bitstat::Watchers::Average do
       @average.update(20) # ignored
       @average.update(30) # ignored
       @average.update(50)
-      @average.value.should eql 30.0
+      @average.value.should eql 30
     end
 
     it 'returns 0 if no values were provided' do
-      @average.value.should eql 0.0
+      @average.value.should eql 0
     end
   end
 end

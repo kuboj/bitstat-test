@@ -59,7 +59,7 @@ describe Bitstat::Sender do
       before do
         $retries = 0
         $thread = Thread.new do
-          Rack::Handler::Thin.run(DummyServer, { :Port => 30000 }) do |server|
+          Rack::Handler::Thin.run(DummyServer, { :Port => 30011 }) do |server|
             $thin = server
             Thin::Logging.silent = true
           end
@@ -68,7 +68,7 @@ describe Bitstat::Sender do
         sleep(0.1) until $thin && $thin.running?
 
         @sender = Bitstat::Sender.new(
-            :url         => 'http://localhost:30000/halt',
+            :url         => 'http://localhost:30011/halt',
             :max_retries => 5,
             :wait_time   => 0.1
         )
@@ -86,7 +86,7 @@ describe Bitstat::Sender do
       before do
         $retries = 0
         $thread2 = Thread.new do
-          Rack::Handler::Thin.run(DummyServer, { :Port => 30002 }) do |server|
+          Rack::Handler::Thin.run(DummyServer, { :Port => 30012 }) do |server|
             $thin2 = server
             Thin::Logging.silent = true
             server.ssl = true
@@ -101,7 +101,7 @@ describe Bitstat::Sender do
         sleep(0.1) until $thin2.running?
 
         @sender2 = Bitstat::Sender.new(
-            :url         => 'https://localhost:30002/halt',
+            :url         => 'https://localhost:30012/halt',
             :max_retries => 5,
             :wait_time   => 0.1
         )
