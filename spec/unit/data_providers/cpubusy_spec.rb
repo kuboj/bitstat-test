@@ -70,7 +70,7 @@ describe Bitstat::DataProviders::Cpubusy do
       @vestat.stub(:regenerate)
       @vestat.stub(:vpss).and_return(
           { 1 => { :idle => 10 }},
-          { 1 => { :idle => 15 }, 2 => { :idle => 30}}
+          { 1 => { :idle => 15 }, 2 => { :idle => 30 }}
       )
       @cpubusy = Bitstat::DataProviders::Cpubusy.new(@vestat)
       @cpubusy.stub(:calculate_load)
@@ -109,7 +109,7 @@ describe Bitstat::DataProviders::Cpubusy do
           :nice => 30,
           :system => 50
       }
-      @cpubusy.calculate_load(data).should eql 50.0
+      @cpubusy.calculate_load(data).should eql 50
 
       data = {
           :idle => 300000000,
@@ -117,18 +117,18 @@ describe Bitstat::DataProviders::Cpubusy do
           :nice => 30,
           :system => 50
       }
-      @cpubusy.calculate_load(data).should eql 25.0
+      @cpubusy.calculate_load(data).should eql 25
     end
 
-    it 'returns float' do
+    it 'returns integer' do
       data = {
           :idle => 100000000,
           :user => 20,
           :nice => 30,
           :system => 50
       }
-      @cpubusy.calculate_load(data).should_not eql 50
-      @cpubusy.calculate_load(data).should eql 50.0
+      @cpubusy.calculate_load(data).should_not eql 50.0
+      @cpubusy.calculate_load(data).should eql 50
     end
   end
 
