@@ -49,7 +49,7 @@ module Bitstat
 
       if ssl?
         request[:ssl_ca_file] = @crt_path
-        request[:verify_ssl]  = @verify_ssl
+        request[:verify_ssl]  = @verify_ssl ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
       end
 
       request
