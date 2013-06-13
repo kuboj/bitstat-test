@@ -42,7 +42,13 @@ module Bitstat
       end
 
       def calculate_load(data)
-        (100.0 - data[:idle] * 100.0 / (100.0**3 * (data[:user] + data[:nice] + data[:system]) + data[:idle])).to_i
+        l = 100.0 - data[:idle] * 100.0 / (100.0**3 * (data[:user] + data[:nice] + data[:system]) + data[:idle])
+        if l.nan?
+          warn("Calculate load - NaN. idle=#{data[:idle]} user=#{data[:user]} nice=#{data[:nice]} system=#{data[:system]}")
+          0
+        else
+          l.to_i
+        end
       end
 
       # Returns hash of vpss indexed by vps id. Each vps is represented
