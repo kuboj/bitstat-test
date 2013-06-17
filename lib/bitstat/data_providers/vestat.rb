@@ -36,7 +36,7 @@ module Bitstat
         File.readlines(@path)
       rescue Errno::ENOENT => e
         warn("File #@path does not exist, retrying ...")
-        sleep(0.01)
+        sleep(0.1)
         retry
       end
 
