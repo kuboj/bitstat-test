@@ -61,7 +61,7 @@ module Bitstat
           :target => STDERR
       })
       self.extend(Bitlogger::Loggable)
-      debug('kvik')
+      debug("Sending #{action} to controller")
       controller_request = { :request => (options.merge(:action => action)).to_json }
       sender.send_data(controller_request)
     end
