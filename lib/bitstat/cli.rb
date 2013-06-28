@@ -63,7 +63,8 @@ module Bitstat
       self.extend(Bitlogger::Loggable)
       debug("Sending #{action} to controller")
       controller_request = { :request => (options.merge(:action => action)).to_json }
-      sender.send_data(controller_request)
+      retval = sender.send_data(controller_request)
+      abort("Error while #{action}") if retval.nil?
     end
 
     private
