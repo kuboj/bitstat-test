@@ -76,7 +76,7 @@ describe Bitstat::Sender do
 
       it 'tries :count times to send data' do
         data = { :halt => 'mnaf' }
-        expected = {}
+        expected = nil
         @sender.send_data(data).should eql expected
         $retries.should eql 5
       end
