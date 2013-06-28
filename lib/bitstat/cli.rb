@@ -44,9 +44,10 @@ module Bitstat
       }
 
       Daemons.run_proc(@options[:app_name], daemon_options) do
-        initialize_bitlogger
-        initialize_exit_handler
         $DEBUG = @options[:devel][:debug]
+        initialize_bitlogger
+        self.extend(Bitlogger::Loggable)
+        initialize_exit_handler
         controller.start
         initialize_term_handler
         controller.join
@@ -55,6 +56,12 @@ module Bitstat
 
     def send_to_controller(action, options = {})
       $DEBUG = @options[:devel][:debug]
+      Bitlogger.init({
+          :level  => @options[:logging][:level],
+          :target => STDERR
+      })
+      self.extend(Bitlogger::Loggable)
+      debug('kvik')
       controller_request = { :request => (options.merge(:action => action)).to_json }
       sender.send_data(controller_request)
     end
