@@ -13,13 +13,15 @@ module Bitstat
         get_vestat_output.each do |l|
           next if skip_line?(l)
           veid, user, nice, system, idle = parse_line(l)
-          @vpss << {
-              :veid   => veid,
-              :user   => user,
-              :nice   => nice,
-              :system => system,
-              :idle   => idle
-          }
+          if [veid, user, nice, system, idle].all? { |i| !i.nil? }
+            @vpss << {
+                :veid   => veid,
+                :user   => user,
+                :nice   => nice,
+                :system => system,
+                :idle   => idle
+            }
+          end
         end
       end
 
@@ -30,6 +32,9 @@ module Bitstat
       def parse_line(l)
         veid, user, nice, system, _, idle = l.scan(/\d+/).map(&:to_i)
         [veid, user, nice, system, idle]
+      rescue => e
+        error("Error while parsing line '#{line}'", e)
+        nil
       end
 
       def get_vestat_output
