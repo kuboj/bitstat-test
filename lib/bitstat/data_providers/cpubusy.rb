@@ -53,7 +53,7 @@ module Bitstat
 
       # Returns hash of vpss indexed by vps id. Each vps is represented
       # by hash with only one key - :cpubusy. Note that :cpubusy is calculated
-      # via diff of underlaying values from Vestat, therefore two calls of
+      # via diff of underlying values from Vestat, therefore two calls of
       # #regenerate are required to get :cpubusy values
       #
       # NOTE: it is important that each data provider yields it's values under

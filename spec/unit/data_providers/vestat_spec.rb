@@ -24,6 +24,37 @@ Version: 2.2
       vestat.should_receive(:parse_line).exactly(3).times
       vestat.regenerate
     end
+
+    it 'skips line if cannot be parsed' do
+      vestat_text = <<-VESTAT
+Version: 2.2
+                VEID                 user                 nice               system               uptime                 idle                 strv               uptime                 used               maxlat               totlat             numsched
+                 721                66017                   17               139850            104123408      101385808831824                    0      104123409048607         271334829526                    0                    0                    0
+                 719               779973                   13               457112            104352274      106365771148640                    0      104352274720395        1309046705295                    0                    0                    0
+                 717               117552                   15               292414
+      VESTAT
+
+      vestat = Bitstat::DataProviders::Vestat.new({ :path => nil })
+      vestat.stub(:get_vestat_output => vestat_text)
+      expected = [
+          {
+              :user   => 66017,
+              :veid   => 721,
+              :nice   => 17,
+              :idle   => 101385808831824,
+              :system => 139850
+          },
+          {
+              :user   => 779973,
+              :veid   => 719,
+              :nice   => 13,
+              :idle   => 106365771148640,
+              :system => 457112
+          }
+      ]
+      vestat.regenerate
+      vestat.instance_variable_get(:@vpss).should eql expected
+    end
   end
 
   describe '#skip_line?' do

@@ -11,7 +11,10 @@ module Bitstat
 
       def regenerate
         @vpss = []
-        get_vzlist_output.each_line { |l| @vpss << parse_line(l) }
+        get_vzlist_output.each_line do |l|
+          parsed = parse_line(l)
+          @vpss << parsed unless parsed.nil?
+        end
       end
 
       def command
@@ -20,6 +23,9 @@ module Bitstat
 
       def parse_line(line)
         sanitize_values(Hash[@fields.zip(line.split(' ').map { |i| i == i.to_i.to_s ? i.to_i : i})])
+      rescue => e
+        error("Error while parsing line '#{line}'", e)
+        nil
       end
 
       def get_vzlist_output
