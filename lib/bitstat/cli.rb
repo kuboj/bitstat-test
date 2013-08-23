@@ -113,15 +113,17 @@ module Bitstat
           :port                => @options[:bitstat][:port],
           :app_class           => Bitstat::SinatraApp,
           :application_options => {
-              :vestat_path       => @options[:bitstat][:vestat_path],
-              :vzlist_fields     => @options[:bitstat][:vzlist_fields],
-              :nodes_config_path => @options[:nodes_config_path],
-              :resources_path    => @options[:bitstat][:resources_path],
-              :ticker_interval   => @options[:bitstat][:tick],
-              :supervisor_url    => @options[:bitsuper][:url],
-              :verify_ssl        => @options[:bitsuper][:verify_crt],
-              :node_id           => @options[:bitstat][:node_id],
-              :crt_path          => @options[:bitsuper][:verify_crt] ? @options[:bitsuper][:ca_crt_path] : nil
+              :vestat_path            => @options[:bitstat][:vestat_path],
+              :vzlist_fields          => @options[:bitstat][:vzlist_fields],
+              :filesystem_prefix      => @options[:bitstat][:filesystem_prefix],
+              :enabled_data_providers => @options[:bitstat][:enabled_data_providers],
+              :nodes_config_path      => @options[:nodes_config_path],
+              :resources_path         => @options[:bitstat][:resources_path],
+              :ticker_interval        => @options[:bitstat][:tick],
+              :supervisor_url         => @options[:bitsuper][:url],
+              :verify_ssl             => @options[:bitsuper][:verify_crt],
+              :node_id                => @options[:bitstat][:node_id],
+              :crt_path               => @options[:bitsuper][:verify_crt] ? @options[:bitsuper][:ca_crt_path] : nil
           }
       )
     end

@@ -3,17 +3,19 @@ require 'spec_helper'
 describe Bitstat::Application do
   let(:valid_args) {
     {
-        :vestat_path       => nil,
-        :vzlist_fields     => nil,
-        :nodes_config_path => nil,
-        :resources_path    => nil,
-        :ticker_interval   => nil,
-        :supervisor_url    => nil,
-        :verify_ssl        => nil,
-        :node_id           => nil,
-        :crt_path          => nil,
-        :max_retries       => nil,
-        :wait_time         => nil
+        :vestat_path            => nil,
+        :vzlist_fields          => nil,
+        :filesystem_prefix      => nil,
+        :enabled_data_providers => [:vzlist, :cpubusy, :physpages],
+        :nodes_config_path      => nil,
+        :resources_path         => nil,
+        :ticker_interval        => nil,
+        :supervisor_url         => nil,
+        :verify_ssl             => nil,
+        :node_id                => nil,
+        :crt_path               => nil,
+        :max_retries            => nil,
+        :wait_time              => nil
     }
   }
 
@@ -57,7 +59,7 @@ describe Bitstat::Application do
   end
 
   describe '#start' do
-    it 'sets data providers to collector and starts ticker' do
+    it 'sets enabled data providers to collector and starts ticker' do
       collector.should_receive(:set_data_provider).with(:vzlist, vzlist)
       collector.should_receive(:set_data_provider).with(:cpubusy, cpubusy)
       collector.should_receive(:set_data_provider).with(:physpages, physpages)
