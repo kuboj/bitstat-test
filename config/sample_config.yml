@@ -15,6 +15,11 @@ bitstat:
   node_id: 1
   # timeout after which will 'SIGKILL' be sent when stopping bitstat
   force_kill_waittime: 30
+  filesystem_prefix: vz/private/
+  enabled_data_providers:
+    - zfs_diskspace
+    - cpubusy
+    - physpages
 
 bitsuper:
   url: https://admin:admin@localhost:30000

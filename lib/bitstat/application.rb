@@ -4,17 +4,19 @@ module Bitstat
 
     def initialize(options)
       @options = options
-      @vestat_path       = options.fetch(:vestat_path)
-      @vzlist_fields     = options.fetch(:vzlist_fields)
-      @nodes_config_path = options.fetch(:nodes_config_path)
-      @resources_path    = options.fetch(:resources_path)
-      @ticker_interval   = options.fetch(:ticker_interval)
-      @supervisor_url    = options.fetch(:supervisor_url)
-      @verify_ssl        = options.fetch(:verify_ssl)
-      @node_id           = options.fetch(:node_id)
-      @crt_path          = options.fetch(:crt_path,    nil)
-      @max_retries       = options.fetch(:max_retries, nil)
-      @wait_time         = options.fetch(:wait_time,   nil)
+      @vestat_path            = options.fetch(:vestat_path)
+      @vzlist_fields          = options.fetch(:vzlist_fields)
+      @filesystem_prefix      = options.fetch(:filesystem_prefix)
+      @enabled_data_providers = options.fetch(:enabled_data_providers)
+      @nodes_config_path      = options.fetch(:nodes_config_path)
+      @resources_path         = options.fetch(:resources_path)
+      @ticker_interval        = options.fetch(:ticker_interval)
+      @supervisor_url         = options.fetch(:supervisor_url)
+      @verify_ssl             = options.fetch(:verify_ssl)
+      @node_id                = options.fetch(:node_id)
+      @crt_path               = options.fetch(:crt_path,    nil)
+      @max_retries            = options.fetch(:max_retries, nil)
+      @wait_time              = options.fetch(:wait_time,   nil)
     end
 
     def start
@@ -69,9 +71,9 @@ module Bitstat
 
     private
     def set_data_providers
-      collector.set_data_provider(:vzlist,    vzlist)
-      collector.set_data_provider(:cpubusy,   cpubusy)
-      collector.set_data_provider(:physpages, physpages)
+      @enabled_data_providers.each do |dp|
+        collector.set_data_provider(dp.to_sym, self.__send__(dp.to_sym))
+      end
     end
 
     def create_node(id, config)
@@ -98,6 +100,10 @@ module Bitstat
 
     def vzlist
       @vzlist ||= DataProviders::Vzlist.new(:fields => @vzlist_fields)
+    end
+
+    def zfs_diskspace
+      @zfs_diskspace ||= DataProviders::ZfsDiskspace.new(:filesystem_prefix => @filesystem_prefix)
     end
 
     def vestat

@@ -4,14 +4,16 @@ describe Bitstat do
   describe 'application' do
     it 'works' do
       app = Bitstat::Application.new({
-          :vestat_path       => nil,
-          :vzlist_fields     => nil,
-          :nodes_config_path => "#{APP_DIR}/spec/integration/config/nodes.yml",
-          :resources_path    => nil,
-          :ticker_interval   => 0.1,
-          :supervisor_url    => nil,
-          :verify_ssl        => false,
-          :node_id           => 2
+          :vestat_path            => nil,
+          :vzlist_fields          => nil,
+          :filesystem_prefix      => 'vz/private',
+          :enabled_data_providers => [:zfs_diskspace, :cpubusy],
+          :nodes_config_path      => "#{APP_DIR}/spec/integration/config/nodes.yml",
+          :resources_path         => nil,
+          :ticker_interval        => 0.1,
+          :supervisor_url         => nil,
+          :verify_ssl             => false,
+          :node_id                => 2
       })
 
       vzlist = double('vzlist')
