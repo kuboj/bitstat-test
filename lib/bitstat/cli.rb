@@ -44,13 +44,18 @@ module Bitstat
       }
 
       Daemons.run_proc(@options[:app_name], daemon_options) do
-        $DEBUG = @options[:devel][:debug]
-        initialize_bitlogger
-        self.extend(Bitlogger::Loggable)
-        initialize_exit_handler
-        controller.start
-        initialize_term_handler
-        controller.join
+        begin
+          $DEBUG = @options[:devel][:debug]
+          initialize_bitlogger
+          self.extend(Bitlogger::Loggable)
+          initialize_exit_handler
+          controller.start
+          initialize_term_handler
+          controller.join
+        rescue => e
+          error(e)
+          abort(1)
+        end
       end
     end
 
@@ -65,6 +70,9 @@ module Bitstat
       controller_request = { :request => (options.merge(:action => action)).to_json }
       retval = sender.send_data(controller_request)
       abort("Error while #{action}") if retval.nil?
+    rescue => e
+      error(e)
+      abort(1)
     end
 
     private
