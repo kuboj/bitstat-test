@@ -60,7 +60,7 @@ module Bitstat
     def send_to_controller(action, options = {})
       $DEBUG = @options[:devel][:debug]
       Bitlogger.init({
-          :level  => @options[:logging][:level],
+          :level  => :debug,
           :target => STDERR
       })
       self.extend(Bitlogger::Loggable)
