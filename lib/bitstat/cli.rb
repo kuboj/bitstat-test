@@ -138,18 +138,22 @@ module Bitstat
     end
 
     def initialize_bitlogger
-      logging_options = {
-          :level      => @options[:logging][:level],
-          :additional => { :hostname => `hostname`.strip }
-      }
-      if @options[:logging][:target] == 'supervisor'
-        logging_options[:target]      = @options[:bitsuper][:url].gsub('/notify', '/logs')
-        logging_options[:buffered]    = true
-        logging_options[:ca_crt_path] = @options[:bitsuper][:ca_crt_path]
-      else
-        logging_options[:target] = @options[:logging][:target]
+      loggers_config = if @options[:logging].is_a?(Hash)
+                         [@options[:logging]]
+                       elsif @options[:logging].is_a?(Array)
+                         @options[:logging]
+                       end
+      loggers_config.map! do |logger_config|
+        if logger_config[:target] == 'supervisor'
+          logger_config[:target]      = @options[:bitsuper][:url].gsub('/notify', '/logs')
+          logger_config[:buffered]    = true
+          logger_config[:ca_crt_path] = @options[:bitsuper][:ca_crt_path]
+        end
+        logger_config[:additional] = { :hostname => `hostname`.strip }
+        logger_config
       end
-      Bitlogger.init(logging_options)
+
+      Bitlogger.init(loggers_config)
     end
 
     def initialize_exit_handler
