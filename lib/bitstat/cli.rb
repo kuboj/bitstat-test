@@ -143,7 +143,7 @@ module Bitstat
           :additional => { :hostname => `hostname`.strip }
       }
       if @options[:logging][:target] == 'supervisor'
-        logging_options[:target]      = "#{@options[:bitsuper][:url]}/logs"
+        logging_options[:target]      = @options[:bitsuper][:url].gsub('/notify', '/logs')
         logging_options[:buffered]    = true
         logging_options[:ca_crt_path] = @options[:bitsuper][:ca_crt_path]
       else

@@ -22,7 +22,7 @@ bitstat:
     - physpages
 
 bitsuper:
-  url: https://admin:admin@localhost:30000
+  url: https://admin:admin@localhost:30000/notify
   # verifies server cert when executing rest client call
   verify_crt: false
   # absolute path to CA crt
