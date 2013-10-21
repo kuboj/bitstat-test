@@ -21,9 +21,7 @@ module Bitstat
     end
 
     def load_config(path)
-      config = YAML.load_file(path).symbolize_string_keys
-      config[:logging][:level] = config[:logging][:level].to_sym
-      config
+      YAML.load_file(path).symbolize_string_keys
     end
 
     def run
