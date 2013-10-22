@@ -35,7 +35,7 @@ module Bitstat
       def get_file_contents(path)
         File.readlines(path)
       rescue Errno::ENOENT => e
-        warn("File #{path} does not exist, retrying ...")
+        info("File #{path} does not exist, retrying ...")
         sleep(0.01)
         retry
       end
