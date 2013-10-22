@@ -40,7 +40,7 @@ module Bitstat
       def get_vestat_output
         File.readlines(@path)
       rescue Errno::ENOENT => e
-        warn("File #@path does not exist, retrying ...")
+        info("File #@path does not exist, retrying ...")
         sleep(0.1)
         retry
       end
