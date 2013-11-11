@@ -14,7 +14,7 @@ module Bitstat
       response = nil
       success = try(:count  => @max_retries,
                     :wait   => @wait_time,
-                    :rescue => [RestClient::InternalServerError, Errno::ECONNREFUSED, RestClient::RequestTimeout]) do
+                    :rescue => [RestClient::InternalServerError, Errno::ECONNREFUSED, Errno::ETIMEDOUT, RestClient::RequestTimeout]) do
         response = rc_send(data)
         response.code == 200
       end
