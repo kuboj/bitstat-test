@@ -1,9 +1,5 @@
 module Bitstat
   class CLI
-    DAEMONS_COMMANDS = %w(start stop restart status run)
-    CUSTOM_COMMANDS  = %w(node_info reload)
-    COMMANDS = DAEMONS_COMMANDS + CUSTOM_COMMANDS
-
     def initialize(args)
       options = default_options.merge(parse!(args))
       config  = load_config(options[:config_path])
@@ -14,6 +10,8 @@ module Bitstat
     def run
       $DEBUG = @options[:devel][:debug]
 
+      $0 = 'bitstat'
+      daemonize if @options[:daemon]
       initialize_exit_handler
       initialize_bitlogger
       setup_signals
@@ -33,7 +31,7 @@ module Bitstat
           :crash_log_path    => "#{APP_DIR}/log/crash.log",
           :nodes_config_path => "#{APP_DIR}/config/nodes.yml",
           :app_name          => 'bitstat',
-          :pid               => "#{APP_DIR}/pid/bitstat.pid"
+          :pid_path          => "#{APP_DIR}/pid/bitstat.pid"
       }
     end
 
@@ -52,8 +50,8 @@ module Bitstat
           options[:daemon] = daemon ? true : false
         end
 
-        opts.on('-p', '--pid PATH', "File to store pid to (default: pid/bitstat.pid)") do |pid|
-          options[:pid] = pid
+        opts.on('-p', '--pid PATH', "File to store pid to (default: pid/bitstat.pid)") do |pid_path|
+          options[:pid_path] = pid_path
         end
 
         opts.on_tail('-h','--help', 'Show this message') do
@@ -140,9 +138,24 @@ module Bitstat
     #  Signal.trap('INT')  { controller.stop }
     #end
 
+    def daemonize
+      if RUBY_VERSION < "1.9"
+        exit if fork
+        Process.setsid
+        exit if fork
+        Dir.chdir "/"
+        STDIN.reopen "/dev/null"
+        STDOUT.reopen "/dev/null", "a"
+        STDERR.reopen "/dev/null", "a"
+      else
+        Process.daemon
+      end
+    end
+
     def setup_signals
-      Signal.trap('TERM') { application.stop }
-      Signal.trap('INT')  { application.stop }
+      Signal.trap('TERM')   { application.stop }
+      Signal.trap('INT')    { application.stop }
+      Signal.trap('SIGHUP') { application.reload }
     end
 
     def initialize_bitlogger
