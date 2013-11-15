@@ -3,7 +3,6 @@ module Bitstat
     include Bitlogger::Loggable
 
     def initialize(options)
-      @options = options
       @vestat_path            = options.fetch(:vestat_path)
       @vzlist_fields          = options.fetch(:vzlist_fields)
       @filesystem_prefix      = options.fetch(:filesystem_prefix)

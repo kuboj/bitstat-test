@@ -7,6 +7,7 @@ module Bitstat
       @id           = options.fetch(:id)
       @notify_queue = options.fetch(:notify_queue)
       @watchers     = {}
+      debug("Creating node id=#{@id}")
       create_watchers(options.fetch(:watchers_config))
     end
 
