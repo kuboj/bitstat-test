@@ -1,146 +1,161 @@
 module Bitstat
   class CLI
-    DAEMONS_COMMANDS = %w(start stop restart status run)
-    CUSTOM_COMMANDS  = %w(node_info reload)
-    COMMANDS = DAEMONS_COMMANDS + CUSTOM_COMMANDS
-
     def initialize(args)
-      @options = default_options
-      parse_args(args)
-      @options = @options.merge(load_config(@options[:config_path]))
+      options = default_options.merge(parse!(args))
+      config  = load_config(options[:config_path])
+
+      @options = default_options.merge(config).merge(options)
     end
 
-    def default_options
-      {
-          :config_path       => "#{APP_DIR}/config/config.yml",
-          :crash_log_path    => "#{APP_DIR}/log/crash.log",
-          :pid_dir           => "#{APP_DIR}/pid/",
-          :nodes_config_path => "#{APP_DIR}/config/nodes.yml",
-          :app_name          => 'bitstat'
-      }
+    def run
+      $DEBUG = @options[:devel][:debug]
+
+      $0 = 'bitstat'
+      daemonize if @options[:daemon]
+      initialize_exit_handler
+      initialize_bitlogger
+      setup_signals
+      application.start
+      application.reload
+      application.join
     end
 
     def load_config(path)
       YAML.load_file(path).symbolize_string_keys
     end
 
-    def run
-      if DAEMONS_COMMANDS.include?(@options[:command])
-        run_daemons(@options[:command])
-      elsif CUSTOM_COMMANDS.include?(@options[:command])
-        send_to_controller(@options[:command])
-      end
+    def default_options
+      {
+          :config_path       => "#{APP_DIR}/config/config.yml",
+          :daemon            => false,
+          :crash_log_path    => "#{APP_DIR}/log/crash.log",
+          :nodes_config_path => "#{APP_DIR}/config/nodes.yml",
+          :app_name          => 'bitstat',
+          :pid_path          => "#{APP_DIR}/pid/bitstat.pid"
+      }
     end
 
-    def run_daemons(command)
-      daemon_options = {
-          :dir_mode            => :normal,
-          :dir                 => @options[:pid_dir],
-          :multiple            => false,
-          :force_kill_waittime => @options[:bitstat][:force_kill_waittime],
-          :ARGV                => [command]
-      }
+    def parse!(args)
+      options = {}
 
-      Daemons.run_proc(@options[:app_name], daemon_options) do
-        begin
-          $DEBUG = @options[:devel][:debug]
-          initialize_bitlogger
-          self.extend(Bitlogger::Loggable)
-          initialize_exit_handler
-          controller.start
-          initialize_term_handler
-          controller.join
-        rescue => e
-          error(e)
-          abort(1)
+      opt_parser = OptionParser.new do |opts|
+        opts.banner = 'Usage: bitstat [options]'
+        opts.separator "\nOptions:"
+
+        opts.on('-c', "--config FILE", "Path to config file (default: config/config.yml)") do |config_path|
+          options[:config_path] = File.expand_path("#{Dir.getwd}/#{config_path}") # TODO
+        end
+
+        opts.on('-d', "--daemon", "Daemonize (default: #{default_options[:daemon]})") do |daemon|
+          options[:daemon] = daemon ? true : false
+        end
+
+        opts.on('-p', '--pid PATH', "File to store pid to (default: pid/bitstat.pid)") do |pid_path|
+          options[:pid_path] = pid_path
+        end
+
+        opts.on_tail('-h','--help', 'Show this message') do
+          puts opts
+          exit
+        end
+
+        opts.on_tail('-v', '--version', 'Show version') do
+          s = "Bitstat #{Bitstat::VERSION}"
+          s << " (build: #{Bitstat::BUILD})" if defined?(Bitstat::BUILD)
+          puts s
+          exit
         end
       end
-    end
 
-    def send_to_controller(action, options = {})
-      $DEBUG = @options[:devel][:debug]
-      Bitlogger.init({
-          :level  => :debug,
-          :target => STDERR
-      })
-      self.extend(Bitlogger::Loggable)
-      debug("Sending #{action} to controller")
-      controller_request = { :request => (options.merge(:action => action)).to_json }
-      retval = sender.send_data(controller_request)
-      abort("Error while #{action}") if retval.nil?
-    rescue => e
-      error(e)
-      abort(1)
-    end
-
-    private
-    def parse_args(args)
-      OptionParser.new(&method(:set_opts)).parse!(args)
-    rescue OptionParser::InvalidArgument, OptionParser::InvalidOption => e
-      abort(e.message)
-    end
-
-    def set_opts(opts)
-      opts.banner = 'Usage: bitstat [options] COMMAND'
-      opts.define_head "Bitstat, version #{Bitstat::VERSION}"
-      opts.separator "\nOptions:"
-
-      opts.on("-f", "--config FILE", "Path to config file, defaults to #{default_options[:config_path]}") do |config_path|
-        @options[:config_path] = config_path
-        raise OptionParser::InvalidArgument, "File #{config_path} does not exist!" unless File.exists?(config_path)
+      begin
+        opt_parser.parse!(args)
+      rescue OptionParser::InvalidArgument, OptionParser::InvalidOption => e
+        puts e.message
+        abort(opt_parser.to_s)
       end
 
-      opts.on_tail('-v', '--version', 'Print version') do
-        puts "Bitstat #{Bitstat::VERSION}"
-        exit
-      end
-
-      help = Proc.new do
-        puts opts
-        puts
-        puts "COMMAND has to be one of #{COMMANDS.map { |s| "`#{s}`"}.join(',')}"
-        exit
-      end
-
-      help.call if ARGV.empty?
-
-      command = ARGV.pop
-      if COMMANDS.include?(command)
-        @options[:command] = command
-      else
-        raise OptionParser::InvalidArgument, "Unknown command #{command}"
-      end
-
-      opts.on_tail('-h','--help', 'Show this message', &help)
+      options
     end
 
-    def controller
-      @controller ||= Controller.new(
-          :port                => @options[:bitstat][:port],
-          :app_class           => Bitstat::SinatraApp,
-          :application_options => {
-              :vestat_path            => @options[:bitstat][:vestat_path],
-              :vzlist_fields          => @options[:bitstat][:vzlist_fields],
-              :filesystem_prefix      => @options[:bitstat][:filesystem_prefix],
-              :enabled_data_providers => @options[:bitstat][:enabled_data_providers],
-              :nodes_config_path      => @options[:nodes_config_path],
-              :resources_path         => @options[:bitstat][:resources_path],
-              :ticker_interval        => @options[:bitstat][:tick],
-              :supervisor_url         => @options[:bitsuper][:url],
-              :verify_ssl             => @options[:bitsuper][:verify_crt],
-              :node_id                => @options[:bitstat][:node_id],
-              :crt_path               => @options[:bitsuper][:verify_crt] ? @options[:bitsuper][:ca_crt_path] : nil
-          }
+    #def send_to_controller(action, options = {})
+    #  $DEBUG = @options[:devel][:debug]
+    #  Bitlogger.init({
+    #      :level  => :debug,
+    #      :target => STDERR
+    #  })
+    #  self.extend(Bitlogger::Loggable)
+    #  debug("Sending #{action} to controller")
+    #  controller_request = { :request => (options.merge(:action => action)).to_json }
+    #  retval = sender.send_data(controller_request)
+    #  abort("Error while #{action}") if retval.nil?
+    #rescue => e
+    #  error(e)
+    #  abort(1)
+    #end
+
+    #def controller
+    #  @controller ||= Controller.new(
+    #      :port                => @options[:bitstat][:port],
+    #      :app_class           => Bitstat::SinatraApp,
+    #      :application_options => {
+    #          :vestat_path            => @options[:bitstat][:vestat_path],
+    #          :vzlist_fields          => @options[:bitstat][:vzlist_fields],
+    #          :filesystem_prefix      => @options[:bitstat][:filesystem_prefix],
+    #          :enabled_data_providers => @options[:bitstat][:enabled_data_providers],
+    #          :nodes_config_path      => @options[:nodes_config_path],
+    #          :resources_path         => @options[:bitstat][:resources_path],
+    #          :ticker_interval        => @options[:bitstat][:tick],
+    #          :supervisor_url         => @options[:bitsuper][:url],
+    #          :verify_ssl             => @options[:bitsuper][:verify_crt],
+    #          :node_id                => @options[:bitstat][:node_id],
+    #          :crt_path               => @options[:bitsuper][:verify_crt] ? @options[:bitsuper][:ca_crt_path] : nil
+    #      }
+    #  )
+    #end
+
+    def application
+      @application ||= Application.new(
+          :vestat_path            => @options[:bitstat][:vestat_path],
+          :vzlist_fields          => @options[:bitstat][:vzlist_fields],
+          :filesystem_prefix      => @options[:bitstat][:filesystem_prefix],
+          :enabled_data_providers => @options[:bitstat][:enabled_data_providers],
+          :nodes_config_path      => @options[:nodes_config_path],
+          :resources_path         => @options[:bitstat][:resources_path],
+          :ticker_interval        => @options[:bitstat][:tick],
+          :supervisor_url         => @options[:bitsuper][:url],
+          :verify_ssl             => @options[:bitsuper][:verify_crt],
+          :node_id                => @options[:bitstat][:node_id],
+          :crt_path               => @options[:bitsuper][:verify_crt] ? @options[:bitsuper][:ca_crt_path] : nil
       )
     end
 
-    def sender
-      @sender ||= Sender.new(:url => "http://localhost:#{@options[:bitstat][:port]}")
+    #def sender
+    #  @sender ||= Sender.new(:url => "http://localhost:#{@options[:bitstat][:port]}")
+    #end
+
+    #def initialize_term_handler
+    #  Signal.trap('TERM') { controller.stop }
+    #  Signal.trap('INT')  { controller.stop }
+    #end
+
+    def daemonize
+      if RUBY_VERSION < "1.9"
+        exit if fork
+        Process.setsid
+        exit if fork
+        Dir.chdir "/"
+        STDIN.reopen "/dev/null"
+        STDOUT.reopen "/dev/null", "a"
+        STDERR.reopen "/dev/null", "a"
+      else
+        Process.daemon
+      end
     end
 
-    def initialize_term_handler
-      Signal.trap('TERM') { controller.stop }
-      Signal.trap('INT')  { controller.stop }
+    def setup_signals
+      Signal.trap('TERM')   { application.stop }
+      Signal.trap('INT')    { application.stop }
+      Signal.trap('SIGHUP') { application.reload }
     end
 
     def initialize_bitlogger
@@ -160,6 +175,7 @@ module Bitstat
       end
 
       Bitlogger.init(loggers_config)
+      self.extend(Bitlogger::Loggable)
     end
 
     def initialize_exit_handler
@@ -179,6 +195,5 @@ module Bitstat
         end
       end
     end
-
   end
 end
