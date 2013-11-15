@@ -16,8 +16,11 @@ module Bitstat
       initialize_bitlogger
       setup_signals
       application.start
+      write_pid
       application.reload
       application.join
+    ensure
+      delete_pid
     end
 
     def load_config(path)
@@ -150,6 +153,15 @@ module Bitstat
       else
         Process.daemon
       end
+    end
+
+    def write_pid
+      FileUtils.mkdir_p(File.dirname(@options[:pid_path]))
+      File.open(@options[:pid_path], 'w+') { |f| f.write(Process.pid) }
+    end
+
+    def delete_pid
+      FileUtils.rm_rf(@options[:pid_path])
     end
 
     def setup_signals
