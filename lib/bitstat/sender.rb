@@ -78,7 +78,7 @@ module Bitstat
           begin
             r = block.call(retries)
           rescue *exceptions => e
-            error("Error in #{e.backtrace[1]}", e)
+            warn("Sender: trying to send (#{retries}/#{count}) rescued error in #{e.backtrace[1]}", e)
           end
           success = r
           sleep(wait_time) unless success
