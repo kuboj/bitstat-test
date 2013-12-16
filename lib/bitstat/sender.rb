@@ -1,4 +1,6 @@
 module Bitstat
+  class SenderError < StandardError; end
+
   class Sender
     include Bitlogger::Loggable
 
@@ -18,6 +20,7 @@ module Bitstat
         response = rc_send(data)
         response.code == 200
       end
+      raise SenderError unless success
       parse_response(response)
     rescue => e
       error("Error sending request (#{data.to_json} to #@url}", e)
