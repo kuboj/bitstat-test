@@ -20,7 +20,7 @@ module Bitstat
       if data.has_key?(@id)
         data = data[@id]
       else
-        info("Node id=#@id. data variable does not contain anything for this node.")
+        debug("Node id=#@id. data variable does not contain anything for this node.")
         return
       end
 
