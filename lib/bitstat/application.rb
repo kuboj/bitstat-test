@@ -121,6 +121,10 @@ module Bitstat
       @mpstat ||= DataProviders::Mpstat.new(:node_id => @node_id)
     end
 
+    def free
+      @free ||= DataProviders::Free.new(:node_id => @node_id)
+    end
+
     def nodes_config
       @nodes_config ||= NodesConfig.new(:path => @nodes_config_path)
     end

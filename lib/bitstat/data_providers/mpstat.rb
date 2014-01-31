@@ -11,10 +11,8 @@ module Bitstat
       def regenerate
         @vpss = []
 
-        get_mpstat_output.each_line do |l|
-          parsed = parse_line(l)
-          @vpss << parsed unless parsed.nil?
-        end
+        parsed = parse_line(get_mpstat_output)
+        @vpss << parsed unless parsed.nil?
       end
 
       def command

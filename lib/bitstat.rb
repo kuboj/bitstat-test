@@ -28,6 +28,7 @@ require 'bitstat/data_providers/vestat'
 require 'bitstat/data_providers/vzlist'
 require 'bitstat/data_providers/physpages'
 require 'bitstat/data_providers/mpstat'
+require 'bitstat/data_providers/free'
 require 'bitstat/data_providers/zfs_diskspace'
 
 require 'bitstat/watchers/average'
