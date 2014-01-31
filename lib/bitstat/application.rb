@@ -125,6 +125,10 @@ module Bitstat
       @free ||= DataProviders::Free.new(:node_id => @node_id)
     end
 
+    def zfs_total_diskspace
+      @free ||= DataProviders::ZfsTotalDiskspace.new(:node_id => @node_id)
+    end
+
     def nodes_config
       @nodes_config ||= NodesConfig.new(:path => @nodes_config_path)
     end

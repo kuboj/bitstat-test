@@ -30,6 +30,7 @@ require 'bitstat/data_providers/physpages'
 require 'bitstat/data_providers/mpstat'
 require 'bitstat/data_providers/free'
 require 'bitstat/data_providers/zfs_diskspace'
+require 'bitstat/data_providers/zfs_total_diskspace'
 
 require 'bitstat/watchers/average'
 require 'bitstat/watchers/down'
