@@ -126,7 +126,7 @@ module Bitstat
     end
 
     def zfs_total_diskspace
-      @free ||= DataProviders::ZfsTotalDiskspace.new(:node_id => @node_id)
+      @zfs_total_diskspace ||= DataProviders::ZfsTotalDiskspace.new(:node_id => @node_id)
     end
 
     def nodes_config
