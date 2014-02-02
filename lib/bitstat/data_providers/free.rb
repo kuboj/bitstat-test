@@ -22,7 +22,7 @@ module Bitstat
       def parse_output(output)
         {
             :veid      => @node_id,
-            :physpages => output.split("\n")[2].split[3].to_i
+            :physpages => output.split("\n")[2].split[2].to_i
         }
       end
 
