@@ -117,6 +117,18 @@ module Bitstat
       @physpages ||= DataProviders::Physpages.new(:resources_path => @resources_path)
     end
 
+    def mpstat
+      @mpstat ||= DataProviders::Mpstat.new(:node_id => @node_id)
+    end
+
+    def free
+      @free ||= DataProviders::Free.new(:node_id => @node_id)
+    end
+
+    def zfs_total_diskspace
+      @zfs_total_diskspace ||= DataProviders::ZfsTotalDiskspace.new(:node_id => @node_id)
+    end
+
     def nodes_config
       @nodes_config ||= NodesConfig.new(:path => @nodes_config_path)
     end
