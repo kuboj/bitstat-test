@@ -23,7 +23,7 @@ module Bitstat
       def parse_output(output)
         {
             :veid      => @node_id,
-            :diskspace => output.strip.to_megabytes[1..-2].to_i
+            :diskspace => output.strip.to_megabytes[0..-2].to_i
         }
       end
 
