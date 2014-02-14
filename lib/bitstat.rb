@@ -37,6 +37,7 @@ require 'bitstat/watchers/down'
 require 'bitstat/watchers/up'
 
 require 'bitstat/core_ext/object'
+require 'bitstat/core_ext/string'
 
 module Bitstat
 
