@@ -23,25 +23,12 @@ module Bitstat
       def parse_output(output)
         {
             :veid      => @node_id,
-            :diskspace => to_megabytes(output.strip)
+            :diskspace => output.strip.to_megabytes[1..-2].to_i
         }
       end
 
       def get_zfs_output
         `#{command}`
-      end
-
-      def to_megabytes(value)
-        if value.end_with?("T")
-          value[0..-2].to_i * 1024 * 1024
-        elsif value.end_with?("G")
-          value[0..-2].to_i * 1024
-        elsif value.end_with?("M")
-          value[0..-2].to_i
-        else
-          error("DataProviders::ZfsTotalDiskspace: Unparsable value: '#{value}'")
-          nil
-        end
       end
 
       def each_vps(&block)
