@@ -28,6 +28,7 @@ module Bitstat
         watchers.each do |watcher_type, watcher| # watcher type - e.g. :up, :down, ...
           if data[parameter]
             watcher.update(data[parameter])
+            watcher.age if watcher.respond_to?(:age)
             if watcher.notify?
               add_notification(parameter, watcher_type, watcher.value)
               watcher.reset
