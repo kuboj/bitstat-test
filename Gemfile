@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-source 'http://gem.int.prg.relbit.com/'
 
 gem 'bitlogger',     '~>2.0.1'
 gem 'rest-client',   '~>1.6.7'

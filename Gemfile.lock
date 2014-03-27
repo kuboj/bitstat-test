@@ -1,6 +1,5 @@
 GEM
   remote: https://rubygems.org/
-  remote: http://gem.int.prg.relbit.com/
   specs:
     activesupport (3.2.17)
       i18n (~> 0.6, >= 0.6.4)
